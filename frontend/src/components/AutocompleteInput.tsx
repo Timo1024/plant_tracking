@@ -117,7 +117,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
                 className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${className}`}
                 autoComplete="off"
             />
-            
+
             {isOpen && filteredSuggestions.length > 0 && (
                 <div className="absolute z-50 w-full mt-1 bg-white border-2 border-green-500 rounded shadow-xl max-h-60 overflow-y-auto">
                     {filteredSuggestions.map((suggestion, index) => (
@@ -125,18 +125,17 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
                             key={index}
                             onClick={() => handleSuggestionClick(suggestion)}
                             onMouseEnter={() => setHighlightedIndex(index)}
-                            className={`px-3 py-2 cursor-pointer transition-colors ${
-                                index === highlightedIndex
+                            className={`px-3 py-2 cursor-pointer transition-colors ${index === highlightedIndex
                                     ? 'bg-green-50 text-green-700'
                                     : 'hover:bg-green-50 hover:text-green-700'
-                            }`}
+                                }`}
                         >
                             {suggestion}
                         </div>
                     ))}
                 </div>
             )}
-            
+
             {isOpen && filteredSuggestions.length === 0 && value.trim() !== '' && (
                 <div className="absolute z-50 w-full mt-1 bg-white border-2 border-gray-300 rounded shadow-xl">
                     <div className="px-3 py-2 text-gray-500 italic">
