@@ -11,6 +11,7 @@ const MovePlantForm: React.FC = () => {
     const [destPotQR, setDestPotQR] = useState('');
     const [sourcePot, setSourcePot] = useState<Pot | null>(null);
     const [destPot, setDestPot] = useState<Pot | null>(null);
+    const [selectedPlantId, setSelectedPlantId] = useState<number | null>(null);
     const [filteredSourcePots, setFilteredSourcePots] = useState<Pot[]>([]);
     const [filteredDestPots, setFilteredDestPots] = useState<Pot[]>([]);
     const [isArchiving, setIsArchiving] = useState(false);
@@ -68,10 +69,15 @@ const MovePlantForm: React.FC = () => {
         // Clear dropdown immediately
         setFilteredSourcePots([]);
         setSourcePotQR(qrCode);
+        setSelectedPlantId(null); // Reset plant selection when changing pot
 
         try {
             const response = await potAPI.getByQRCode(qrCode);
             setSourcePot(response.data);
+            // Auto-select plant if only one plant in pot
+            if (response.data.current_plants && response.data.current_plants.length === 1) {
+                setSelectedPlantId(response.data.current_plants[0].id);
+            }
         } catch (err) {
             setError('Failed to fetch source pot details');
             console.error(err);
@@ -97,8 +103,21 @@ const MovePlantForm: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        if (!sourcePot || !sourcePot.current_plant) {
-            setError('Source pot must have a plant in it');
+        if (!sourcePot) {
+            setError('Please select a source pot');
+            setLoading(false);
+            return;
+        }
+
+        if (!selectedPlantId) {
+            setError('Please select a plant to move');
+            setLoading(false);
+            return;
+        }
+
+        const selectedPlant = sourcePot.current_plants?.find(p => p.id === selectedPlantId);
+        if (!selectedPlant) {
+            setError('Selected plant not found');
             setLoading(false);
             return;
         }
@@ -111,13 +130,13 @@ const MovePlantForm: React.FC = () => {
                 return;
             }
 
-            if (!window.confirm(`Are you sure you want to archive ${sourcePot.current_plant.name}?\nReason: ${removeReason}`)) {
+            if (!window.confirm(`Are you sure you want to archive ${selectedPlant.name}?\nReason: ${removeReason}`)) {
                 setLoading(false);
                 return;
             }
 
             try {
-                await plantAPI.remove(sourcePot.current_plant.id, removeReason);
+                await plantAPI.remove(selectedPlant.id, removeReason);
                 navigate('/');
             } catch (err) {
                 setError('Failed to archive plant. Please try again.');
@@ -141,7 +160,7 @@ const MovePlantForm: React.FC = () => {
 
             try {
                 await historyAPI.movePlant({
-                    plant_id: sourcePot.current_plant.id,
+                    plant_id: selectedPlant.id,
                     pot_id: destPot.id,
                     soil_id: parseInt(formData.soil_id),
                     start_date: formData.start_date,
@@ -209,8 +228,10 @@ const MovePlantForm: React.FC = () => {
                                     <div className="font-medium">📦 QR: {pot.qr_code_id}</div>
                                     <div className="text-sm text-gray-600">
                                         {pot.room} - {pot.size}
-                                        {pot.current_plant && (
-                                            <span className="text-green-600 font-semibold"> • {pot.current_plant.name}</span>
+                                        {pot.current_plants && pot.current_plants.length > 0 && (
+                                            <span className="text-blue-600 font-semibold">
+                                                {' '}• {pot.current_plants.length} plant{pot.current_plants.length !== 1 ? 's' : ''}
+                                            </span>
                                         )}
                                     </div>
                                 </button>
@@ -227,6 +248,7 @@ const MovePlantForm: React.FC = () => {
                                     onClick={() => {
                                         setSourcePot(null);
                                         setSourcePotQR('');
+                                        setSelectedPlantId(null);
                                     }}
                                     className="text-sm text-green-700 hover:text-green-900 underline"
                                 >
@@ -239,15 +261,12 @@ const MovePlantForm: React.FC = () => {
                             <p className="text-sm text-green-800">
                                 <span className="font-medium">Location:</span> {sourcePot.room} - {sourcePot.size}
                             </p>
-                            {sourcePot.current_plant ? (
-                                <div className="mt-2 pt-2 border-t border-green-300">
-                                    <p className="text-sm text-green-800 font-semibold">
-                                        🌱 Plant: {sourcePot.current_plant.name}
-                                    </p>
-                                    <p className="text-xs text-green-700">
-                                        {sourcePot.current_plant.genus} {sourcePot.current_plant.species}
-                                    </p>
-                                </div>
+
+                            {/* Show plant count */}
+                            {sourcePot.current_plants && sourcePot.current_plants.length > 0 ? (
+                                <p className="text-sm text-green-800 mt-2">
+                                    <span className="font-medium">Plants in pot:</span> {sourcePot.current_plants.length}
+                                </p>
                             ) : (
                                 <p className="text-sm text-red-600 font-semibold mt-2">
                                     ⚠️ This pot is empty - cannot move
@@ -257,8 +276,49 @@ const MovePlantForm: React.FC = () => {
                     )}
                 </div>
 
+                {/* Plant Selection - shown when source pot has plants */}
+                {sourcePot && sourcePot.current_plants && sourcePot.current_plants.length > 0 && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Select Plant to Move *
+                        </label>
+                        <div className="space-y-2">
+                            {sourcePot.current_plants.map((plant) => (
+                                <label
+                                    key={plant.id}
+                                    className={`flex items-start p-3 border-2 rounded cursor-pointer transition-colors ${selectedPlantId === plant.id
+                                            ? 'border-green-500 bg-green-50'
+                                            : 'border-gray-300 hover:border-green-300'
+                                        }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="selectedPlant"
+                                        checked={selectedPlantId === plant.id}
+                                        onChange={() => setSelectedPlantId(plant.id)}
+                                        className="mt-1 mr-3"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="font-semibold text-gray-900">
+                                            🌱 {plant.name}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            {plant.genus} {plant.species}
+                                            {plant.species2 && ` × ${plant.species2}`}
+                                            {plant.variation && ` '${plant.variation}'`}
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1">
+                                            Size: {plant.size}
+                                        </div>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Action Selection: Move or Archive */}
-                {sourcePot && sourcePot.current_plant && (
+                {sourcePot && selectedPlantId && (
                     <div className="bg-blue-50 border border-blue-200 rounded p-4">
                         <label className="block text-sm font-medium text-gray-700 mb-3">
                             What would you like to do?
@@ -289,7 +349,7 @@ const MovePlantForm: React.FC = () => {
                 )}
 
                 {/* Archive Reason - shown only when archiving */}
-                {isArchiving && sourcePot && sourcePot.current_plant && (
+                {isArchiving && sourcePot && selectedPlantId && (
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Reason for Removal *
