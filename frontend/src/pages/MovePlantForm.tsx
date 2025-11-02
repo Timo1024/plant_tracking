@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { potAPI, soilAPI, historyAPI } from '../services/api';
+import { potAPI, soilAPI, historyAPI, plantAPI } from '../services/api';
 import { Pot, Soil } from '../types';
 
 const MovePlantForm: React.FC = () => {
@@ -13,6 +13,8 @@ const MovePlantForm: React.FC = () => {
     const [destPot, setDestPot] = useState<Pot | null>(null);
     const [filteredSourcePots, setFilteredSourcePots] = useState<Pot[]>([]);
     const [filteredDestPots, setFilteredDestPots] = useState<Pot[]>([]);
+    const [isArchiving, setIsArchiving] = useState(false);
+    const [removeReason, setRemoveReason] = useState('');
     const [formData, setFormData] = useState({
         soil_id: '',
         start_date: new Date().toISOString().split('T')[0],
@@ -101,32 +103,57 @@ const MovePlantForm: React.FC = () => {
             return;
         }
 
-        if (!destPot) {
-            setError('Please select a destination pot');
-            setLoading(false);
-            return;
-        }
+        if (isArchiving) {
+            // Archive/remove the plant
+            if (!removeReason.trim()) {
+                setError('Please provide a reason for removing the plant');
+                setLoading(false);
+                return;
+            }
 
-        if (!formData.soil_id) {
-            setError('Please select a soil mix');
-            setLoading(false);
-            return;
-        }
+            if (!window.confirm(`Are you sure you want to archive ${sourcePot.current_plant.name}?\nReason: ${removeReason}`)) {
+                setLoading(false);
+                return;
+            }
 
-        try {
-            await historyAPI.movePlant({
-                plant_id: sourcePot.current_plant.id,
-                pot_id: destPot.id,
-                soil_id: parseInt(formData.soil_id),
-                start_date: formData.start_date,
-                notes: formData.notes || undefined,
-            });
-            navigate('/');
-        } catch (err) {
-            setError('Failed to move plant. Please check all fields.');
-            console.error(err);
-        } finally {
-            setLoading(false);
+            try {
+                await plantAPI.remove(sourcePot.current_plant.id, removeReason);
+                navigate('/');
+            } catch (err) {
+                setError('Failed to archive plant. Please try again.');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            // Move the plant to a new pot
+            if (!destPot) {
+                setError('Please select a destination pot');
+                setLoading(false);
+                return;
+            }
+
+            if (!formData.soil_id) {
+                setError('Please select a soil mix');
+                setLoading(false);
+                return;
+            }
+
+            try {
+                await historyAPI.movePlant({
+                    plant_id: sourcePot.current_plant.id,
+                    pot_id: destPot.id,
+                    soil_id: parseInt(formData.soil_id),
+                    start_date: formData.start_date,
+                    notes: formData.notes || undefined,
+                });
+                navigate('/');
+            } catch (err) {
+                setError('Failed to move plant. Please check all fields.');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -230,132 +257,208 @@ const MovePlantForm: React.FC = () => {
                     )}
                 </div>
 
-                {/* Destination Pot Selection */}
-                <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        To Pot (QR Code) *
-                    </label>
-                    <input
-                        type="text"
-                        placeholder="Enter or scan QR code of destination pot..."
-                        value={destPotQR}
-                        onChange={(e) => setDestPotQR(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                        disabled={!!destPot}
-                    />
-
-                    {filteredDestPots.length > 0 && (
-                        <div className="absolute z-10 w-full mt-1 border border-gray-300 rounded max-h-48 overflow-y-auto bg-white shadow-lg">
-                            {filteredDestPots.map((pot) => (
-                                <button
-                                    key={pot.id}
-                                    type="button"
-                                    onClick={() => handleDestPotSelect(pot.qr_code_id)}
-                                    className="w-full text-left px-3 py-2 hover:bg-gray-100 border-b last:border-b-0"
-                                >
-                                    <div className="font-medium">📦 QR: {pot.qr_code_id}</div>
-                                    <div className="text-sm text-gray-600">
-                                        {pot.room} - {pot.size}
-                                        {pot.current_plant ? (
-                                            <span className="text-orange-600 font-semibold"> • Occupied: {pot.current_plant.name}</span>
-                                        ) : (
-                                            <span className="text-gray-500"> • Empty</span>
-                                        )}
-                                    </div>
-                                </button>
-                            ))}
+                {/* Action Selection: Move or Archive */}
+                {sourcePot && sourcePot.current_plant && (
+                    <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                            What would you like to do?
+                        </label>
+                        <div className="space-y-2">
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="action"
+                                    checked={!isArchiving}
+                                    onChange={() => setIsArchiving(false)}
+                                    className="mr-2"
+                                />
+                                <span className="text-sm">🔄 Move to another pot</span>
+                            </label>
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="action"
+                                    checked={isArchiving}
+                                    onChange={() => setIsArchiving(true)}
+                                    className="mr-2"
+                                />
+                                <span className="text-sm">🗑️ Archive/Remove plant</span>
+                            </label>
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {destPot && (
-                        <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-4">
-                            <div className="flex justify-between items-start mb-2">
-                                <h3 className="font-semibold text-blue-900">✓ Destination Pot Selected</h3>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setDestPot(null);
-                                        setDestPotQR('');
-                                    }}
-                                    className="text-sm text-blue-700 hover:text-blue-900 underline"
-                                >
-                                    Change
-                                </button>
+                {/* Archive Reason - shown only when archiving */}
+                {isArchiving && sourcePot && sourcePot.current_plant && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Reason for Removal *
+                        </label>
+                        <select
+                            value={removeReason}
+                            onChange={(e) => setRemoveReason(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                            required={isArchiving}
+                        >
+                            <option value="">Select a reason...</option>
+                            <option value="Died">Died</option>
+                            <option value="Given away">Given away</option>
+                            <option value="Sold">Sold</option>
+                            <option value="Looked bad">Looked bad / unhealthy</option>
+                            <option value="Too big">Too big to manage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        {removeReason === 'Other' && (
+                            <input
+                                type="text"
+                                placeholder="Please specify the reason..."
+                                onChange={(e) => setRemoveReason(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 mt-2"
+                            />
+                        )}
+                    </div>
+                )}
+
+                {/* Destination Pot Selection - only shown when NOT archiving */}
+                {!isArchiving && (
+                    <div className="relative">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            To Pot (QR Code) *
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Enter or scan QR code of destination pot..."
+                            value={destPotQR}
+                            onChange={(e) => setDestPotQR(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                            disabled={!!destPot}
+                        />
+
+                        {filteredDestPots.length > 0 && (
+                            <div className="absolute z-10 w-full mt-1 border border-gray-300 rounded max-h-48 overflow-y-auto bg-white shadow-lg">
+                                {filteredDestPots.map((pot) => (
+                                    <button
+                                        key={pot.id}
+                                        type="button"
+                                        onClick={() => handleDestPotSelect(pot.qr_code_id)}
+                                        className="w-full text-left px-3 py-2 hover:bg-gray-100 border-b last:border-b-0"
+                                    >
+                                        <div className="font-medium">📦 QR: {pot.qr_code_id}</div>
+                                        <div className="text-sm text-gray-600">
+                                            {pot.room} - {pot.size}
+                                            {pot.current_plant ? (
+                                                <span className="text-orange-600 font-semibold"> • Occupied: {pot.current_plant.name}</span>
+                                            ) : (
+                                                <span className="text-gray-500"> • Empty</span>
+                                            )}
+                                        </div>
+                                    </button>
+                                ))}
                             </div>
-                            <p className="text-sm text-blue-800">
-                                <span className="font-medium">QR Code:</span> {destPot.qr_code_id}
-                            </p>
-                            <p className="text-sm text-blue-800">
-                                <span className="font-medium">Location:</span> {destPot.room} - {destPot.size}
-                            </p>
-                            {destPot.current_plant && (
-                                <p className="text-sm text-orange-600 font-semibold mt-2">
-                                    ⚠️ Warning: Currently occupied by {destPot.current_plant.name}
+                        )}
+
+                        {destPot && (
+                            <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-semibold text-blue-900">✓ Destination Pot Selected</h3>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setDestPot(null);
+                                            setDestPotQR('');
+                                        }}
+                                        className="text-sm text-blue-700 hover:text-blue-900 underline"
+                                    >
+                                        Change
+                                    </button>
+                                </div>
+                                <p className="text-sm text-blue-800">
+                                    <span className="font-medium">QR Code:</span> {destPot.qr_code_id}
                                 </p>
-                            )}
-                        </div>
-                    )}
-                </div>
+                                <p className="text-sm text-blue-800">
+                                    <span className="font-medium">Location:</span> {destPot.room} - {destPot.size}
+                                </p>
+                                {destPot.current_plant && (
+                                    <p className="text-sm text-orange-600 font-semibold mt-2">
+                                        ⚠️ Warning: Currently occupied by {destPot.current_plant.name}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
 
-                {/* Soil Mix Selection */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Soil Mix *
-                    </label>
-                    <select
-                        name="soil_id"
-                        required
-                        value={formData.soil_id}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                        <option value="">-- Select a Soil Mix --</option>
-                        {soils.map((soil) => (
-                            <option key={soil.id} value={soil.id}>
-                                {soil.name} - {soil.composition}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                {/* Soil Mix Selection - only shown when NOT archiving */}
+                {!isArchiving && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Soil Mix *
+                        </label>
+                        <select
+                            name="soil_id"
+                            required
+                            value={formData.soil_id}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="">-- Select a Soil Mix --</option>
+                            {soils.map((soil) => (
+                                <option key={soil.id} value={soil.id}>
+                                    {soil.name} - {soil.composition}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
-                {/* Start Date */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Move Date *
-                    </label>
-                    <input
-                        type="date"
-                        name="start_date"
-                        required
-                        value={formData.start_date}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                </div>
+                {/* Start Date - only shown when NOT archiving */}
+                {!isArchiving && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Move Date *
+                        </label>
+                        <input
+                            type="date"
+                            name="start_date"
+                            required
+                            value={formData.start_date}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                    </div>
+                )}
 
-                {/* Notes */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Notes (Optional)
-                    </label>
-                    <textarea
-                        name="notes"
-                        value={formData.notes}
-                        onChange={handleChange}
-                        rows={3}
-                        placeholder="Add any notes about this move..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                </div>
+                {/* Notes - only shown when NOT archiving */}
+                {!isArchiving && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Notes (Optional)
+                        </label>
+                        <textarea
+                            name="notes"
+                            value={formData.notes}
+                            onChange={handleChange}
+                            rows={3}
+                            placeholder="Add any notes about this move..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                    </div>
+                )}
 
                 {/* Buttons */}
                 <div className="flex space-x-4">
                     <button
                         type="submit"
-                        disabled={loading || !sourcePot || !destPot}
-                        className="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        disabled={loading || !sourcePot || (isArchiving ? !removeReason : !destPot)}
+                        className={`flex-1 text-white px-4 py-2 rounded disabled:bg-gray-400 disabled:cursor-not-allowed ${isArchiving
+                                ? 'bg-red-600 hover:bg-red-700'
+                                : 'bg-green-600 hover:bg-green-700'
+                            }`}
                     >
-                        {loading ? 'Moving Plant...' : 'Move Plant'}
+                        {loading
+                            ? (isArchiving ? 'Archiving...' : 'Moving Plant...')
+                            : (isArchiving ? 'Archive Plant' : 'Move Plant')
+                        }
                     </button>
                     <button
                         type="button"
