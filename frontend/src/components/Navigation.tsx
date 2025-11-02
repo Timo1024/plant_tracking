@@ -13,6 +13,9 @@ const Navigation: React.FC = () => {
                         <Link to="/" className="hover:bg-green-700 px-3 py-2 rounded">
                             Dashboard
                         </Link>
+                        <Link to="/pots" className="hover:bg-green-700 px-3 py-2 rounded">
+                            Pots
+                        </Link>
                         <Link to="/add-plant" className="hover:bg-green-700 px-3 py-2 rounded">
                             Add Plant
                         </Link>
