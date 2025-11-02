@@ -41,7 +41,7 @@ const MovePlantForm: React.FC = () => {
 
     // Filter pots based on QR code input
     useEffect(() => {
-        if (sourcePotQR) {
+        if (sourcePotQR && !sourcePot) {
             const filtered = pots.filter(pot =>
                 pot.qr_code_id.toLowerCase().includes(sourcePotQR.toLowerCase())
             );
@@ -49,10 +49,10 @@ const MovePlantForm: React.FC = () => {
         } else {
             setFilteredSourcePots([]);
         }
-    }, [sourcePotQR, pots]);
+    }, [sourcePotQR, pots, sourcePot]);
 
     useEffect(() => {
-        if (destPotQR) {
+        if (destPotQR && !destPot) {
             const filtered = pots.filter(pot =>
                 pot.qr_code_id.toLowerCase().includes(destPotQR.toLowerCase())
             );
@@ -60,14 +60,16 @@ const MovePlantForm: React.FC = () => {
         } else {
             setFilteredDestPots([]);
         }
-    }, [destPotQR, pots]);
+    }, [destPotQR, pots, destPot]);
 
     const handleSourcePotSelect = async (qrCode: string) => {
+        // Clear dropdown immediately
+        setFilteredSourcePots([]);
+        setSourcePotQR(qrCode);
+
         try {
             const response = await potAPI.getByQRCode(qrCode);
             setSourcePot(response.data);
-            setSourcePotQR(qrCode);
-            setFilteredSourcePots([]);
         } catch (err) {
             setError('Failed to fetch source pot details');
             console.error(err);
@@ -75,11 +77,13 @@ const MovePlantForm: React.FC = () => {
     };
 
     const handleDestPotSelect = async (qrCode: string) => {
+        // Clear dropdown immediately
+        setFilteredDestPots([]);
+        setDestPotQR(qrCode);
+
         try {
             const response = await potAPI.getByQRCode(qrCode);
             setDestPot(response.data);
-            setDestPotQR(qrCode);
-            setFilteredDestPots([]);
         } catch (err) {
             setError('Failed to fetch destination pot details');
             console.error(err);
@@ -153,7 +157,7 @@ const MovePlantForm: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
                 {/* Source Pot Selection */}
-                <div>
+                <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         From Pot (QR Code) *
                     </label>
@@ -167,7 +171,7 @@ const MovePlantForm: React.FC = () => {
                     />
 
                     {filteredSourcePots.length > 0 && (
-                        <div className="mt-2 border border-gray-300 rounded max-h-48 overflow-y-auto bg-white shadow-lg">
+                        <div className="absolute z-10 w-full mt-1 border border-gray-300 rounded max-h-48 overflow-y-auto bg-white shadow-lg">
                             {filteredSourcePots.map((pot) => (
                                 <button
                                     key={pot.id}
@@ -227,7 +231,7 @@ const MovePlantForm: React.FC = () => {
                 </div>
 
                 {/* Destination Pot Selection */}
-                <div>
+                <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         To Pot (QR Code) *
                     </label>
@@ -241,7 +245,7 @@ const MovePlantForm: React.FC = () => {
                     />
 
                     {filteredDestPots.length > 0 && (
-                        <div className="mt-2 border border-gray-300 rounded max-h-48 overflow-y-auto bg-white shadow-lg">
+                        <div className="absolute z-10 w-full mt-1 border border-gray-300 rounded max-h-48 overflow-y-auto bg-white shadow-lg">
                             {filteredDestPots.map((pot) => (
                                 <button
                                     key={pot.id}
