@@ -79,11 +79,7 @@ const AddPlantForm: React.FC = () => {
             return;
         }
 
-        if (selectedPot.current_plant) {
-            setError('Selected pot already has a plant. Please choose an empty pot.');
-            setLoading(false);
-            return;
-        }
+        // NOTE: Multiple plants can now share the same pot
 
         if (!formData.soil_id) {
             setError('Please select a soil mix');
@@ -285,8 +281,10 @@ const AddPlantForm: React.FC = () => {
                                     <div className="font-medium">📦 QR: {pot.qr_code_id}</div>
                                     <div className="text-sm text-gray-600">
                                         {pot.room} - {pot.size}
-                                        {pot.current_plant && (
-                                            <span className="text-orange-600 font-semibold"> • Occupied by {pot.current_plant.name}</span>
+                                        {pot.current_plants && pot.current_plants.length > 0 && (
+                                            <span className="text-blue-600 font-semibold">
+                                                {' '}• {pot.current_plants.length} plant{pot.current_plants.length !== 1 ? 's' : ''}
+                                            </span>
                                         )}
                                     </div>
                                 </button>
@@ -315,9 +313,9 @@ const AddPlantForm: React.FC = () => {
                             <p className="text-sm text-green-800">
                                 <span className="font-medium">Location:</span> {selectedPot.room} - {selectedPot.size}
                             </p>
-                            {selectedPot.current_plant && (
-                                <p className="text-sm text-orange-600 font-semibold mt-2">
-                                    ⚠️ Warning: Pot is occupied by {selectedPot.current_plant.name}
+                            {selectedPot.current_plants && selectedPot.current_plants.length > 0 && (
+                                <p className="text-sm text-blue-600 font-medium mt-2">
+                                    ℹ️ This pot currently has {selectedPot.current_plants.length} plant{selectedPot.current_plants.length !== 1 ? 's' : ''}
                                 </p>
                             )}
                         </div>

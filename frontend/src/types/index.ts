@@ -23,7 +23,8 @@ export interface Pot {
     size: string;
     notes?: string;
     active: boolean;
-    current_plant?: Plant;
+    current_plant?: Plant;  // First plant (for backwards compatibility)
+    current_plants?: Plant[];  // All plants in this pot
     current_soil?: Soil;
     start_date?: string;
 }

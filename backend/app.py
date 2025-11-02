@@ -230,16 +230,21 @@ def get_pots():
         for pot in pots:
             pot_dict = pot.to_dict()
 
-            # Get current plant
-            current_history = session.query(PlantPotHistory).filter(
+            # Get all current plants in this pot (multiple plants can share a pot)
+            current_histories = session.query(PlantPotHistory).filter(
                 and_(PlantPotHistory.pot_id == pot.id,
                      PlantPotHistory.end_date.is_(None))
-            ).first()
+            ).all()
 
-            if current_history:
-                pot_dict['current_plant'] = current_history.plant.to_dict()
-                pot_dict['current_soil'] = current_history.soil.to_dict()
+            if current_histories:
+                # Return list of all current plants
+                pot_dict['current_plants'] = [h.plant.to_dict()
+                                              for h in current_histories]
+                # For backwards compatibility, also include the first plant as 'current_plant'
+                pot_dict['current_plant'] = current_histories[0].plant.to_dict()
+                pot_dict['current_soil'] = current_histories[0].soil.to_dict()
             else:
+                pot_dict['current_plants'] = []
                 pot_dict['current_plant'] = None
                 pot_dict['current_soil'] = None
 
@@ -261,17 +266,22 @@ def get_pot_by_qr(qr_code_id):
 
         pot_dict = pot.to_dict()
 
-        # Get current plant
-        current_history = session.query(PlantPotHistory).filter(
+        # Get all current plants in this pot (multiple plants can share a pot)
+        current_histories = session.query(PlantPotHistory).filter(
             and_(PlantPotHistory.pot_id == pot.id,
                  PlantPotHistory.end_date.is_(None))
-        ).first()
+        ).all()
 
-        if current_history:
-            pot_dict['current_plant'] = current_history.plant.to_dict()
-            pot_dict['current_soil'] = current_history.soil.to_dict()
-            pot_dict['start_date'] = current_history.start_date.isoformat()
+        if current_histories:
+            # Return list of all current plants
+            pot_dict['current_plants'] = [h.plant.to_dict()
+                                          for h in current_histories]
+            # For backwards compatibility, also include the first plant as 'current_plant'
+            pot_dict['current_plant'] = current_histories[0].plant.to_dict()
+            pot_dict['current_soil'] = current_histories[0].soil.to_dict()
+            pot_dict['start_date'] = current_histories[0].start_date.isoformat()
         else:
+            pot_dict['current_plants'] = []
             pot_dict['current_plant'] = None
             pot_dict['current_soil'] = None
             pot_dict['start_date'] = None
@@ -468,14 +478,8 @@ def move_plant():
         if previous_history:
             previous_history.end_date = start_date_obj
 
-        # Close any existing assignment for the target pot
-        pot_history = session.query(PlantPotHistory).filter(
-            and_(PlantPotHistory.pot_id == pot_id,
-                 PlantPotHistory.end_date.is_(None))
-        ).first()
-
-        if pot_history:
-            pot_history.end_date = start_date_obj
+        # NOTE: We no longer close existing assignments for the target pot
+        # Multiple plants can now share the same pot
 
         # Create new history entry
         new_history = PlantPotHistory(

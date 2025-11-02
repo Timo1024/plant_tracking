@@ -346,8 +346,10 @@ const MovePlantForm: React.FC = () => {
                                         <div className="font-medium">📦 QR: {pot.qr_code_id}</div>
                                         <div className="text-sm text-gray-600">
                                             {pot.room} - {pot.size}
-                                            {pot.current_plant ? (
-                                                <span className="text-orange-600 font-semibold"> • Occupied: {pot.current_plant.name}</span>
+                                            {pot.current_plants && pot.current_plants.length > 0 ? (
+                                                <span className="text-blue-600 font-semibold">
+                                                    {' '}• {pot.current_plants.length} plant{pot.current_plants.length !== 1 ? 's' : ''}
+                                                </span>
                                             ) : (
                                                 <span className="text-gray-500"> • Empty</span>
                                             )}
@@ -378,9 +380,9 @@ const MovePlantForm: React.FC = () => {
                                 <p className="text-sm text-blue-800">
                                     <span className="font-medium">Location:</span> {destPot.room} - {destPot.size}
                                 </p>
-                                {destPot.current_plant && (
-                                    <p className="text-sm text-orange-600 font-semibold mt-2">
-                                        ⚠️ Warning: Currently occupied by {destPot.current_plant.name}
+                                {destPot.current_plants && destPot.current_plants.length > 0 && (
+                                    <p className="text-sm text-blue-600 font-medium mt-2">
+                                        ℹ️ This pot currently has {destPot.current_plants.length} plant{destPot.current_plants.length !== 1 ? 's' : ''}
                                     </p>
                                 )}
                             </div>
@@ -451,8 +453,8 @@ const MovePlantForm: React.FC = () => {
                         type="submit"
                         disabled={loading || !sourcePot || (isArchiving ? !removeReason : !destPot)}
                         className={`flex-1 text-white px-4 py-2 rounded disabled:bg-gray-400 disabled:cursor-not-allowed ${isArchiving
-                                ? 'bg-red-600 hover:bg-red-700'
-                                : 'bg-green-600 hover:bg-green-700'
+                            ? 'bg-red-600 hover:bg-red-700'
+                            : 'bg-green-600 hover:bg-green-700'
                             }`}
                     >
                         {loading

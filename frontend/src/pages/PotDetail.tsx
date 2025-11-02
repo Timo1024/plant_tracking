@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { potAPI } from '../services/api';
 import { Pot } from '../types';
 
@@ -71,23 +71,29 @@ const PotDetail: React.FC = () => {
                         </div>
                     )}
 
-                    {pot.current_plant ? (
+                    {pot.current_plants && pot.current_plants.length > 0 ? (
                         <div className="mt-6 p-6 bg-green-50 rounded-lg border-2 border-green-500">
                             <h2 className="text-2xl font-bold text-green-800 mb-4">
-                                🌱 Current Plant
+                                🌱 Current Plant{pot.current_plants.length !== 1 ? 's' : ''} ({pot.current_plants.length})
                             </h2>
-                            <div className="space-y-2">
-                                <p className="text-xl font-semibold">{pot.current_plant.name}</p>
-                                <p className="italic text-gray-700">
-                                    {pot.current_plant.genus} {pot.current_plant.species}
-                                    {pot.current_plant.species2 && ` × ${pot.current_plant.species2}`}
-                                </p>
-                                <p className="text-gray-600">
-                                    Family: {pot.current_plant.family}
-                                </p>
-                                <p className="text-gray-600 capitalize">
-                                    Size: {pot.current_plant.size}
-                                </p>
+                            <div className="space-y-6">
+                                {pot.current_plants.map((plant, index) => (
+                                    <div key={plant.id} className={index > 0 ? 'pt-6 border-t border-green-200' : ''}>
+                                        <Link to={`/plants/${plant.id}`} className="text-xl font-semibold text-green-700 hover:text-green-900">
+                                            {plant.name}
+                                        </Link>
+                                        <p className="italic text-gray-700">
+                                            {plant.genus} {plant.species}
+                                            {plant.species2 && ` × ${plant.species2}`}
+                                        </p>
+                                        <p className="text-gray-600">
+                                            Family: {plant.family}
+                                        </p>
+                                        <p className="text-gray-600 capitalize">
+                                            Size: {plant.size}
+                                        </p>
+                                    </div>
+                                ))}
                                 {pot.current_soil && (
                                     <div className="mt-4 pt-4 border-t border-green-200">
                                         <p className="text-sm text-gray-600">Soil Mix</p>
@@ -99,7 +105,7 @@ const PotDetail: React.FC = () => {
                                 )}
                                 {pot.start_date && (
                                     <p className="text-sm text-gray-600 mt-4">
-                                        Potted on: {new Date(pot.start_date).toLocaleDateString()}
+                                        First potted on: {new Date(pot.start_date).toLocaleDateString()}
                                     </p>
                                 )}
                             </div>
