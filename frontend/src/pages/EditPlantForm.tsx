@@ -30,7 +30,7 @@ const EditPlantForm: React.FC = () => {
             setLoading(true);
             const response = await plantAPI.getById(plantId);
             const plant = response.data;
-            
+
             setFormData({
                 name: plant.name,
                 family: plant.family,
