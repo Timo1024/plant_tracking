@@ -10,6 +10,24 @@ const Dashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Helper function to highlight matching text
+    const highlightMatch = (text: string, search: string) => {
+        if (!search.trim()) return text;
+
+        const parts = text.split(new RegExp(`(${search})`, 'gi'));
+        return (
+            <>
+                {parts.map((part, index) =>
+                    part.toLowerCase() === search.toLowerCase() ? (
+                        <mark key={index} className="bg-yellow-200 font-semibold">{part}</mark>
+                    ) : (
+                        part
+                    )
+                )}
+            </>
+        );
+    };
+
     useEffect(() => {
         fetchPlants();
     }, []);
@@ -147,39 +165,41 @@ const Dashboard: React.FC = () => {
                             }`}
                     >
                         <div className="flex justify-between items-start mb-4">
-                            <h2 className="text-xl font-bold text-gray-800">{plant.name}</h2>
+                            <h2 className="text-xl font-bold text-gray-800">
+                                {highlightMatch(plant.name, searchTerm)}
+                            </h2>
                             <span
                                 className={`px-2 py-1 text-xs rounded ${plant.status === 'active'
                                     ? 'bg-green-100 text-green-800'
                                     : 'bg-gray-100 text-gray-800'
                                     }`}
                             >
-                                {plant.status}
+                                {highlightMatch(plant.status, searchTerm)}
                             </span>
                         </div>
 
                         <div className="text-sm text-gray-600 space-y-1">
                             <p className="italic">
-                                {plant.genus} {plant.species}
-                                {plant.species2 && ` × ${plant.species2}`}
-                                {plant.variation && ` '${plant.variation}'`}
+                                {highlightMatch(plant.genus, searchTerm)} {highlightMatch(plant.species, searchTerm)}
+                                {plant.species2 && <> × {highlightMatch(plant.species2, searchTerm)}</>}
+                                {plant.variation && <> '{highlightMatch(plant.variation, searchTerm)}'</>}
                             </p>
-                            <p>Family: {plant.family}</p>
-                            <p>Size: {plant.size}</p>
+                            <p>Family: {highlightMatch(plant.family, searchTerm)}</p>
+                            <p>Size: {highlightMatch(plant.size, searchTerm)}</p>
 
                             {plant.current_pot && (
                                 <div className="mt-3 pt-3 border-t border-gray-200">
-                                    <p className="font-semibold">📍 {plant.current_pot.room}</p>
-                                    <p>Pot: {plant.current_pot.size} ({plant.current_pot.qr_code_id})</p>
+                                    <p className="font-semibold">📍 {highlightMatch(plant.current_pot.room, searchTerm)}</p>
+                                    <p>Pot: {highlightMatch(plant.current_pot.size, searchTerm)} ({highlightMatch(plant.current_pot.qr_code_id, searchTerm)})</p>
                                     {plant.current_soil && (
-                                        <p className="text-xs">Soil: {plant.current_soil.name}</p>
+                                        <p className="text-xs">Soil: {highlightMatch(plant.current_soil.name, searchTerm)}</p>
                                     )}
                                 </div>
                             )}
 
                             {plant.status === 'removed' && plant.removed_reason && (
                                 <div className="mt-3 pt-3 border-t border-gray-200 text-red-600">
-                                    <p className="text-xs">Removed: {plant.removed_reason}</p>
+                                    <p className="text-xs">Removed: {highlightMatch(plant.removed_reason, searchTerm)}</p>
                                 </div>
                             )}
                         </div>
