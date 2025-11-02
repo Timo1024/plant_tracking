@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { plantAPI, potAPI, soilAPI, historyAPI } from '../services/api';
 import { Pot, Soil } from '../types';
+import CustomSelect from '../components/CustomSelect';
 
 const AddPlantForm: React.FC = () => {
     const navigate = useNavigate();
@@ -235,22 +236,21 @@ const AddPlantForm: React.FC = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Size *
-                        </label>
-                        <select
-                            name="size"
+                        <CustomSelect
+                            label="Size"
+                            icon="📏"
                             required
                             value={formData.size}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        >
-                            <option value="seedling">Seedling</option>
-                            <option value="small">Small</option>
-                            <option value="medium">Medium</option>
-                            <option value="large">Large</option>
-                            <option value="giant">Giant</option>
-                        </select>
+                            onChange={(value) => setFormData({ ...formData, size: value })}
+                            placeholder="Select plant size"
+                            options={[
+                                { value: 'seedling', label: 'Seedling', icon: '🌱' },
+                                { value: 'small', label: 'Small', icon: '🪴' },
+                                { value: 'medium', label: 'Medium', icon: '🌿' },
+                                { value: 'large', label: 'Large', icon: '🌳' },
+                                { value: 'giant', label: 'Giant', icon: '🏔️' }
+                            ]}
+                        />
                     </div>
                 </div>
 
@@ -323,25 +323,19 @@ const AddPlantForm: React.FC = () => {
                 </div>
 
                 {/* Soil Mix Selection */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Soil Mix *
-                    </label>
-                    <select
-                        name="soil_id"
-                        required
-                        value={formData.soil_id}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                        <option value="">-- Select a Soil Mix --</option>
-                        {soils.map((soil) => (
-                            <option key={soil.id} value={soil.id}>
-                                {soil.name} - {soil.composition}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <CustomSelect
+                    label="Soil Mix"
+                    icon="🌱"
+                    required
+                    value={formData.soil_id}
+                    onChange={(value) => setFormData({ ...formData, soil_id: value })}
+                    placeholder="-- Select a Soil Mix --"
+                    options={soils.map(soil => ({
+                        value: soil.id.toString(),
+                        label: `${soil.name} - ${soil.composition}`,
+                        icon: '🪴'
+                    }))}
+                />
 
                 {/* Start Date */}
                 <div>

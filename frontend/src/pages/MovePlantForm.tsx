@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { potAPI, soilAPI, historyAPI, plantAPI } from '../services/api';
 import { Pot, Soil } from '../types';
+import CustomSelect from '../components/CustomSelect';
 
 const MovePlantForm: React.FC = () => {
     const navigate = useNavigate();
@@ -287,8 +288,8 @@ const MovePlantForm: React.FC = () => {
                                 <label
                                     key={plant.id}
                                     className={`flex items-start p-3 border-2 rounded cursor-pointer transition-colors ${selectedPlantId === plant.id
-                                            ? 'border-green-500 bg-green-50'
-                                            : 'border-gray-300 hover:border-green-300'
+                                        ? 'border-green-500 bg-green-50'
+                                        : 'border-gray-300 hover:border-green-300'
                                         }`}
                                 >
                                     <input
@@ -351,29 +352,28 @@ const MovePlantForm: React.FC = () => {
                 {/* Archive Reason - shown only when archiving */}
                 {isArchiving && sourcePot && selectedPlantId && (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Reason for Removal *
-                        </label>
-                        <select
+                        <CustomSelect
+                            label="Reason for Removal"
+                            icon="📝"
+                            required
                             value={removeReason}
-                            onChange={(e) => setRemoveReason(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                            required={isArchiving}
-                        >
-                            <option value="">Select a reason...</option>
-                            <option value="Died">Died</option>
-                            <option value="Given away">Given away</option>
-                            <option value="Sold">Sold</option>
-                            <option value="Looked bad">Looked bad / unhealthy</option>
-                            <option value="Too big">Too big to manage</option>
-                            <option value="Other">Other</option>
-                        </select>
+                            onChange={setRemoveReason}
+                            placeholder="Select a reason..."
+                            options={[
+                                { value: 'Died', label: 'Died', icon: '💀' },
+                                { value: 'Given away', label: 'Given away', icon: '🎁' },
+                                { value: 'Sold', label: 'Sold', icon: '💰' },
+                                { value: 'Looked bad', label: 'Looked bad / unhealthy', icon: '😷' },
+                                { value: 'Too big', label: 'Too big to manage', icon: '📏' },
+                                { value: 'Other', label: 'Other', icon: '✏️' }
+                            ]}
+                        />
                         {removeReason === 'Other' && (
                             <input
                                 type="text"
                                 placeholder="Please specify the reason..."
                                 onChange={(e) => setRemoveReason(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 mt-2"
+                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 mt-2 shadow-sm"
                             />
                         )}
                     </div>
@@ -452,25 +452,19 @@ const MovePlantForm: React.FC = () => {
 
                 {/* Soil Mix Selection - only shown when NOT archiving */}
                 {!isArchiving && (
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Soil Mix *
-                        </label>
-                        <select
-                            name="soil_id"
-                            required
-                            value={formData.soil_id}
-                            onChange={handleChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                        >
-                            <option value="">-- Select a Soil Mix --</option>
-                            {soils.map((soil) => (
-                                <option key={soil.id} value={soil.id}>
-                                    {soil.name} - {soil.composition}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <CustomSelect
+                        label="Soil Mix"
+                        icon="🌱"
+                        required
+                        value={formData.soil_id}
+                        onChange={(value) => setFormData({ ...formData, soil_id: value })}
+                        placeholder="-- Select a Soil Mix --"
+                        options={soils.map(soil => ({
+                            value: soil.id.toString(),
+                            label: `${soil.name} - ${soil.composition}`,
+                            icon: '🪴'
+                        }))}
+                    />
                 )}
 
                 {/* Start Date - only shown when NOT archiving */}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { plantAPI } from '../services/api';
+import CustomSelect from '../components/CustomSelect';
 
 const EditPlantForm: React.FC = () => {
     const navigate = useNavigate();
@@ -198,23 +199,21 @@ const EditPlantForm: React.FC = () => {
 
                 {/* Size */}
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="size">
-                        Size *
-                    </label>
-                    <select
-                        id="size"
-                        name="size"
-                        value={formData.size}
-                        onChange={handleChange}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    <CustomSelect
+                        label="Size"
+                        icon="📏"
                         required
-                    >
-                        <option value="seedling">Seedling</option>
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="large">Large</option>
-                        <option value="giant">Giant</option>
-                    </select>
+                        value={formData.size}
+                        onChange={(value) => setFormData({ ...formData, size: value as 'seedling' | 'small' | 'medium' | 'large' | 'giant' })}
+                        placeholder="Select plant size"
+                        options={[
+                            { value: 'seedling', label: 'Seedling', icon: '🌱' },
+                            { value: 'small', label: 'Small', icon: '🪴' },
+                            { value: 'medium', label: 'Medium', icon: '🌿' },
+                            { value: 'large', label: 'Large', icon: '🌳' },
+                            { value: 'giant', label: 'Giant', icon: '🏔️' }
+                        ]}
+                    />
                 </div>
 
                 {/* Notes */}
