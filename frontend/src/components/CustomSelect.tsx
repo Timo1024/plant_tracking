@@ -67,9 +67,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full px-3 py-2 border rounded text-left bg-white focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                    value ? 'text-gray-900' : 'text-gray-500'
-                } ${isOpen ? 'border-green-500 ring-2 ring-green-500' : 'border-gray-300'}`}
+                className={`w-full px-3 py-2 border rounded text-left bg-white focus:outline-none focus:ring-2 focus:ring-green-500 ${value ? 'text-gray-900' : 'text-gray-500'
+                    } ${isOpen ? 'border-green-500 ring-2 ring-green-500' : 'border-gray-300'}`}
             >
                 <div className="flex items-center justify-between">
                     <span>
@@ -119,8 +118,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                     type="button"
                                     onClick={() => handleSelect(option.value)}
                                     className={`w-full px-4 py-3 text-left hover:bg-green-50 transition-colors border-b border-gray-100 last:border-b-0 ${value === option.value
-                                            ? 'bg-green-100 text-green-900 font-semibold'
-                                            : 'text-gray-900'
+                                        ? 'bg-green-100 text-green-900 font-semibold'
+                                        : 'text-gray-900'
                                         }`}
                                 >
                                     <div className="flex items-center">
