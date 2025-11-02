@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { potAPI } from '../services/api';
+import { Pot } from '../types';
+import AutocompleteInput from '../components/AutocompleteInput';
 
 const AddPotForm: React.FC = () => {
     const navigate = useNavigate();
+    const [pots, setPots] = useState<Pot[]>([]);
     const [formData, setFormData] = useState({
         room: '',
         size: '',
@@ -11,6 +14,30 @@ const AddPotForm: React.FC = () => {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Get unique room and size values for autocomplete suggestions
+    const getUniqueRooms = (): string[] => {
+        const rooms = pots.map(pot => pot.room).filter(room => room.trim() !== '');
+        return [...new Set(rooms)].sort();
+    };
+
+    const getUniqueSizes = (): string[] => {
+        const sizes = pots.map(pot => pot.size).filter(size => size.trim() !== '');
+        return [...new Set(sizes)].sort();
+    };
+
+    useEffect(() => {
+        fetchPots();
+    }, []);
+
+    const fetchPots = async () => {
+        try {
+            const response = await potAPI.getAll();
+            setPots(response.data);
+        } catch (err) {
+            console.error('Failed to fetch pots for suggestions:', err);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -53,18 +80,16 @@ const AddPotForm: React.FC = () => {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-4" autoComplete="off">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Room / Location *
                     </label>
-                    <input
-                        type="text"
+                    <AutocompleteInput
                         name="room"
-                        required
                         value={formData.room}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        onChange={(value) => setFormData({ ...formData, room: value })}
+                        suggestions={getUniqueRooms()}
                         placeholder="e.g., Living Room, Balcony"
                     />
                 </div>
@@ -73,14 +98,12 @@ const AddPotForm: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Pot Size *
                     </label>
-                    <input
-                        type="text"
+                    <AutocompleteInput
                         name="size"
-                        required
                         value={formData.size}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        placeholder="e.g., 15 cm, 2L"
+                        onChange={(value) => setFormData({ ...formData, size: value })}
+                        suggestions={getUniqueSizes()}
+                        placeholder="e.g., Small (10cm), Medium (15cm)"
                     />
                 </div>
 

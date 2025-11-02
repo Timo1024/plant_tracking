@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { plantAPI, potAPI, soilAPI, historyAPI } from '../services/api';
-import { Pot, Soil } from '../types';
+import { Pot, Soil, Plant } from '../types';
 import CustomSelect from '../components/CustomSelect';
+import AutocompleteInput from '../components/AutocompleteInput';
 
 const AddPlantForm: React.FC = () => {
     const navigate = useNavigate();
     const [pots, setPots] = useState<Pot[]>([]);
     const [soils, setSoils] = useState<Soil[]>([]);
+    const [plants, setPlants] = useState<Plant[]>([]);
     const [potQR, setPotQR] = useState('');
     const [selectedPot, setSelectedPot] = useState<Pot | null>(null);
     const [filteredPots, setFilteredPots] = useState<Pot[]>([]);
@@ -27,20 +29,30 @@ const AddPlantForm: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Get unique values for autocomplete suggestions
+    const getUniqueSuggestions = (field: keyof Plant): string[] => {
+        const values = plants
+            .map(plant => plant[field])
+            .filter((value): value is string => typeof value === 'string' && value.trim() !== '');
+        return [...new Set(values)].sort();
+    };
+
     useEffect(() => {
         fetchData();
     }, []);
 
     const fetchData = async () => {
         try {
-            const [potsRes, soilsRes] = await Promise.all([
+            const [potsRes, soilsRes, plantsRes] = await Promise.all([
                 potAPI.getAll(),
-                soilAPI.getAll()
+                soilAPI.getAll(),
+                plantAPI.getAll()
             ]);
             setPots(potsRes.data);
             setSoils(soilsRes.data);
+            setPlants(plantsRes.data);
         } catch (err) {
-            setError('Failed to fetch pots and soils');
+            setError('Failed to fetch data');
             console.error(err);
         }
     };
@@ -141,18 +153,16 @@ const AddPlantForm: React.FC = () => {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-4" autoComplete="off">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Common Name *
                     </label>
-                    <input
-                        type="text"
+                    <AutocompleteInput
                         name="name"
-                        required
                         value={formData.name}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        onChange={(value) => setFormData({ ...formData, name: value })}
+                        suggestions={getUniqueSuggestions('name')}
                         placeholder="e.g., My Monstera"
                     />
                 </div>
@@ -162,13 +172,11 @@ const AddPlantForm: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Family *
                         </label>
-                        <input
-                            type="text"
+                        <AutocompleteInput
                             name="family"
-                            required
                             value={formData.family}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            onChange={(value) => setFormData({ ...formData, family: value })}
+                            suggestions={getUniqueSuggestions('family')}
                             placeholder="e.g., Araceae"
                         />
                     </div>
@@ -177,13 +185,11 @@ const AddPlantForm: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Genus *
                         </label>
-                        <input
-                            type="text"
+                        <AutocompleteInput
                             name="genus"
-                            required
                             value={formData.genus}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            onChange={(value) => setFormData({ ...formData, genus: value })}
+                            suggestions={getUniqueSuggestions('genus')}
                             placeholder="e.g., Monstera"
                         />
                     </div>
@@ -194,13 +200,11 @@ const AddPlantForm: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Species *
                         </label>
-                        <input
-                            type="text"
+                        <AutocompleteInput
                             name="species"
-                            required
                             value={formData.species}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            onChange={(value) => setFormData({ ...formData, species: value })}
+                            suggestions={getUniqueSuggestions('species')}
                             placeholder="e.g., deliciosa"
                         />
                     </div>
@@ -209,12 +213,11 @@ const AddPlantForm: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Species 2 (for hybrids)
                         </label>
-                        <input
-                            type="text"
+                        <AutocompleteInput
                             name="species2"
                             value={formData.species2}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            onChange={(value) => setFormData({ ...formData, species2: value })}
+                            suggestions={getUniqueSuggestions('species2')}
                             placeholder="Optional"
                         />
                     </div>
@@ -225,13 +228,12 @@ const AddPlantForm: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Variation
                         </label>
-                        <input
-                            type="text"
+                        <AutocompleteInput
                             name="variation"
                             value={formData.variation}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="e.g., variegated"
+                            onChange={(value) => setFormData({ ...formData, variation: value })}
+                            suggestions={getUniqueSuggestions('variation')}
+                            placeholder="e.g., variegata"
                         />
                     </div>
 

@@ -20,3 +20,39 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
         monospace;
 }
+
+/* Custom datalist dropdown styling */
+datalist {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #10b981;
+    border-radius: 0.375rem;
+    max-height: 15rem;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+datalist option {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    background-color: white;
+    color: #1f2937;
+    font-size: 0.875rem;
+}
+
+datalist option:hover,
+datalist option:focus {
+    background-color: #f0fdf4;
+    color: #15803d;
+}
+
+/* Style the input when it has a datalist */
+input[list]::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+    cursor: pointer;
+    color: #10b981;
+}
+
+input[list]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
