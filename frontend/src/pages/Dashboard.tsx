@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { plantAPI } from '../services/api';
 import { Plant } from '../types';
 
 const Dashboard: React.FC = () => {
+    const navigate = useNavigate();
     const [plants, setPlants] = useState<Plant[]>([]);
     const [filteredPlants, setFilteredPlants] = useState<Plant[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -158,52 +159,66 @@ const Dashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPlants.map((plant) => (
-                    <Link
+                    <div
                         key={plant.id}
-                        to={`/plants/${plant.id}`}
-                        className={`block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow ${plant.status === 'removed' ? 'opacity-50' : ''
+                        className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow ${plant.status === 'removed' ? 'opacity-50' : ''
                             }`}
                     >
                         <div className="flex justify-between items-start mb-4">
-                            <h2 className="text-xl font-bold text-gray-800">
-                                {highlightMatch(plant.name, searchTerm)}
-                            </h2>
-                            <span
-                                className={`px-2 py-1 text-xs rounded ${plant.status === 'active'
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-gray-100 text-gray-800'
-                                    }`}
-                            >
-                                {highlightMatch(plant.status, searchTerm)}
-                            </span>
+                            <Link to={`/plants/${plant.id}`} className="flex-grow">
+                                <h2 className="text-xl font-bold text-gray-800 hover:text-green-600">
+                                    {highlightMatch(plant.name, searchTerm)}
+                                </h2>
+                            </Link>
+                            <div className="flex gap-2 items-center">
+                                <button
+                                    onClick={() => navigate(`/plants/${plant.id}/edit`)}
+                                    className="text-blue-600 hover:text-blue-800 p-1"
+                                    title="Edit plant"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <span
+                                    className={`px-2 py-1 text-xs rounded ${plant.status === 'active'
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-gray-100 text-gray-800'
+                                        }`}
+                                >
+                                    {highlightMatch(plant.status, searchTerm)}
+                                </span>
+                            </div>
                         </div>
 
-                        <div className="text-sm text-gray-600 space-y-1">
-                            <p className="italic">
-                                {highlightMatch(plant.genus, searchTerm)} {highlightMatch(plant.species, searchTerm)}
-                                {plant.species2 && <> × {highlightMatch(plant.species2, searchTerm)}</>}
-                                {plant.variation && <> '{highlightMatch(plant.variation, searchTerm)}'</>}
-                            </p>
-                            <p>Family: {highlightMatch(plant.family, searchTerm)}</p>
-                            <p>Size: {highlightMatch(plant.size, searchTerm)}</p>
+                        <Link to={`/plants/${plant.id}`} className="block">
+                            <div className="text-sm text-gray-600 space-y-1">
+                                <p className="italic">
+                                    {highlightMatch(plant.genus, searchTerm)} {highlightMatch(plant.species, searchTerm)}
+                                    {plant.species2 && <> × {highlightMatch(plant.species2, searchTerm)}</>}
+                                    {plant.variation && <> '{highlightMatch(plant.variation, searchTerm)}'</>}
+                                </p>
+                                <p>Family: {highlightMatch(plant.family, searchTerm)}</p>
+                                <p>Size: {highlightMatch(plant.size, searchTerm)}</p>
 
-                            {plant.current_pot && (
-                                <div className="mt-3 pt-3 border-t border-gray-200">
-                                    <p className="font-semibold">📍 {highlightMatch(plant.current_pot.room, searchTerm)}</p>
-                                    <p>Pot: {highlightMatch(plant.current_pot.size, searchTerm)} ({highlightMatch(plant.current_pot.qr_code_id, searchTerm)})</p>
-                                    {plant.current_soil && (
-                                        <p className="text-xs">Soil: {highlightMatch(plant.current_soil.name, searchTerm)}</p>
-                                    )}
-                                </div>
-                            )}
+                                {plant.current_pot && (
+                                    <div className="mt-3 pt-3 border-t border-gray-200">
+                                        <p className="font-semibold">📍 {highlightMatch(plant.current_pot.room, searchTerm)}</p>
+                                        <p>Pot: {highlightMatch(plant.current_pot.size, searchTerm)} ({highlightMatch(plant.current_pot.qr_code_id, searchTerm)})</p>
+                                        {plant.current_soil && (
+                                            <p className="text-xs">Soil: {highlightMatch(plant.current_soil.name, searchTerm)}</p>
+                                        )}
+                                    </div>
+                                )}
 
-                            {plant.status === 'removed' && plant.removed_reason && (
-                                <div className="mt-3 pt-3 border-t border-gray-200 text-red-600">
-                                    <p className="text-xs">Removed: {highlightMatch(plant.removed_reason, searchTerm)}</p>
-                                </div>
-                            )}
-                        </div>
-                    </Link>
+                                {plant.status === 'removed' && plant.removed_reason && (
+                                    <div className="mt-3 pt-3 border-t border-gray-200 text-red-600">
+                                        <p className="text-xs">Removed: {highlightMatch(plant.removed_reason, searchTerm)}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </Link>
+                    </div>
                 ))}
             </div>
 

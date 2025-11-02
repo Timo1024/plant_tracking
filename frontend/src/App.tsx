@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import PlantDetail from './pages/PlantDetail';
 import PotDetail from './pages/PotDetail';
 import AddPlantForm from './pages/AddPlantForm';
+import EditPlantForm from './pages/EditPlantForm';
 import AddPotForm from './pages/AddPotForm';
 import MovePlantForm from './pages/MovePlantForm';
 import SoilList from './pages/SoilList';
@@ -17,6 +18,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/plants/:id" element={<PlantDetail />} />
+                        <Route path="/plants/:id/edit" element={<EditPlantForm />} />
                         <Route path="/pot/:qrCodeId" element={<PotDetail />} />
                         <Route path="/add-plant" element={<AddPlantForm />} />
                         <Route path="/add-pot" element={<AddPotForm />} />
