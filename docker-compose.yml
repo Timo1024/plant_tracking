@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: planttracker
+      MYSQL_USER: tracker
+      MYSQL_PASSWORD: trackerpass
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: mysql+pymysql://tracker:trackerpass@db:3306/planttracker
+      FLASK_ENV: development
+    volumes:
+      - ./backend:/app
+      - ./backend/static/qrcodes:/app/static/qrcodes
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
