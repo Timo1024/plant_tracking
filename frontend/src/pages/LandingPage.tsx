@@ -68,12 +68,12 @@ const LandingPage: React.FC = () => {
         color,
         icon,
     }) => (
-        <div className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${color}`}>
+        <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-6 border-l-4 ${color} transition-colors`}>
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-gray-500 text-sm font-medium">{title}</p>
-                    <p className="text-3xl font-bold mt-2">{value}</p>
-                    {subtitle && <p className="text-gray-400 text-xs mt-1">{subtitle}</p>}
+                    <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">{title}</p>
+                    <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-gray-100">{value}</p>
+                    {subtitle && <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">{subtitle}</p>}
                 </div>
                 <div className="text-4xl">{icon}</div>
             </div>
@@ -89,13 +89,13 @@ const LandingPage: React.FC = () => {
     }) => (
         <button
             onClick={onClick}
-            className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left w-full border-t-4 ${color} hover:scale-103 transform transition-transform`} // scale-105
+            className={`bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-6 hover:shadow-lg dark:hover:shadow-gray-900/70 transition-all text-left w-full border-t-4 ${color} hover:scale-103 transform`}
         >
             <div className="flex items-start space-x-4">
                 <div className="text-4xl">{icon}</div>
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{description}</p>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{title}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{description}</p>
                 </div>
             </div>
         </button>
@@ -104,7 +104,7 @@ const LandingPage: React.FC = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
-                <div className="text-xl text-gray-600">Loading...</div>
+                <div className="text-xl text-gray-600 dark:text-gray-400">Loading...</div>
             </div>
         );
     }
@@ -112,7 +112,7 @@ const LandingPage: React.FC = () => {
     return (
         <div className="space-y-8">
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-8 text-white">
+            <div className="bg-gradient-to-r from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-lg dark:shadow-gray-900/50 p-8 text-white">
                 <h1 className="text-4xl font-bold mb-2">🌱 Plant Tracker</h1>
                 <p className="text-lg opacity-90">
                     Manage your plant collection with ease. Track plants, pots, soils, and movements all in one place.
@@ -121,7 +121,7 @@ const LandingPage: React.FC = () => {
 
             {/* Statistics Grid */}
             <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Overview</h2>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Overview</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard
                         title="Total Plants"
@@ -156,7 +156,7 @@ const LandingPage: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <ActionCard
                         title="View All Plants"
@@ -207,10 +207,10 @@ const LandingPage: React.FC = () => {
             {recentPlants.length > 0 && (
                 <div>
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-gray-800">Recent Plants</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Recent Plants</h2>
                         <button
                             onClick={() => navigate('/plants')}
-                            className="text-green-600 hover:text-green-700 font-medium"
+                            className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium transition-colors"
                         >
                             View All →
                         </button>
@@ -220,18 +220,18 @@ const LandingPage: React.FC = () => {
                             <div
                                 key={plant.id}
                                 onClick={() => navigate(`/plants/${plant.id}`)}
-                                className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                                className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-4 hover:shadow-lg dark:hover:shadow-gray-900/70 transition-all cursor-pointer"
                             >
-                                <h3 className="font-semibold text-lg text-gray-800">{plant.name}</h3>
-                                <p className="text-sm text-gray-600 italic">
+                                <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">{plant.name}</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 italic">
                                     {plant.genus} {plant.species}
                                 </p>
                                 <div className="mt-2 flex items-center justify-between">
-                                    <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">
+                                    <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 rounded">
                                         {plant.size}
                                     </span>
                                     {plant.current_pot && (
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">
                                             📍 {plant.current_pot.room}
                                         </span>
                                     )}
@@ -246,10 +246,10 @@ const LandingPage: React.FC = () => {
             {recentPots.length > 0 && (
                 <div>
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-gray-800">Recent Pots</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Recent Pots</h2>
                         <button
                             onClick={() => navigate('/pots')}
-                            className="text-green-600 hover:text-green-700 font-medium"
+                            className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium transition-colors"
                         >
                             View All →
                         </button>
@@ -263,28 +263,28 @@ const LandingPage: React.FC = () => {
                                 <div
                                     key={pot.id}
                                     onClick={() => navigate(`/pot/${pot.qr_code_id}`)}
-                                    className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                                    className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-4 hover:shadow-lg dark:hover:shadow-gray-900/70 transition-all cursor-pointer"
                                 >
                                     <div className="flex justify-between items-start mb-2">
                                         <div>
-                                            <h3 className="font-semibold text-gray-800">
+                                            <h3 className="font-semibold text-gray-800 dark:text-gray-100">
                                                 QR: {pot.qr_code_id}
                                             </h3>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                                 📍 {pot.room} • {pot.size}
                                             </p>
                                         </div>
                                         <span
                                             className={`text-xs px-2 py-1 rounded ${hasPlant
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-gray-100 text-gray-600'
+                                                ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300'
+                                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                                                 }`}
                                         >
                                             {hasPlant ? `${plantCount} plant${plantCount > 1 ? 's' : ''}` : 'Empty'}
                                         </span>
                                     </div>
                                     {hasPlant && pot.current_plant && (
-                                        <p className="text-sm text-gray-700 mt-2">
+                                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
                                             🌱 {pot.current_plant.name}
                                         </p>
                                     )}

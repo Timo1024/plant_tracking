@@ -32,6 +32,11 @@ datalist {
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
+.dark datalist {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
 datalist option {
     padding: 0.5rem 0.75rem;
     cursor: pointer;
@@ -40,10 +45,21 @@ datalist option {
     font-size: 0.875rem;
 }
 
+.dark datalist option {
+    background-color: #1f2937;
+    color: #f9fafb;
+}
+
 datalist option:hover,
 datalist option:focus {
     background-color: #f0fdf4;
     color: #15803d;
+}
+
+.dark datalist option:hover,
+.dark datalist option:focus {
+    background-color: #374151;
+    color: #10b981;
 }
 
 /* Style the input when it has a datalist */

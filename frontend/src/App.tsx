@@ -14,7 +14,7 @@ import SoilList from './pages/SoilList';
 function App() {
     return (
         <Router>
-            <div className="min-h-screen bg-gray-100">
+            <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
                 <Navigation />
                 <main className="container mx-auto px-4 py-8">
                     <Routes>
