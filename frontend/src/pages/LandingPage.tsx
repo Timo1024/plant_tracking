@@ -294,18 +294,6 @@ const LandingPage: React.FC = () => {
                     </div>
                 </div>
             )}
-
-            {/* Help Section */}
-            {/* <div className="bg-blue-50 rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-                <h2 className="text-xl font-bold text-gray-800 mb-2">💡 Getting Started</h2>
-                <ul className="space-y-2 text-gray-700">
-                    <li>• <strong>Add a Pot:</strong> Create a new pot with an auto-generated QR code</li>
-                    <li>• <strong>Add a Plant:</strong> Register a new plant and assign it to a pot</li>
-                    <li>• <strong>Move Plants:</strong> Transfer plants between pots while tracking history</li>
-                    <li>• <strong>Soil Mixes:</strong> Create reusable soil recipes for consistent potting</li>
-                    <li>• <strong>QR Codes:</strong> Scan pot QR codes to quickly access pot details</li>
-                </ul>
-            </div> */}
         </div>
     );
 };
