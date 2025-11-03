@@ -109,10 +109,10 @@ const Dashboard: React.FC = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Plant Dashboard</h1>
+                <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Plant Dashboard</h1>
                 <Link
                     to="/add-plant"
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    className="bg-green-600 dark:bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
                 >
                     + Add New Plant
                 </Link>
@@ -126,10 +126,10 @@ const Dashboard: React.FC = () => {
                         placeholder="Search plants by name, species, pot, room, soil, or QR code..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+                        className="w-full px-4 py-3 pl-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                     <svg
-                        className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -144,14 +144,14 @@ const Dashboard: React.FC = () => {
                     {searchTerm && (
                         <button
                             onClick={() => setSearchTerm('')}
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                         >
                             ✕
                         </button>
                     )}
                 </div>
                 {searchTerm && (
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                         Found {filteredPlants.length} plant{filteredPlants.length !== 1 ? 's' : ''}
                     </p>
                 )}
@@ -162,11 +162,11 @@ const Dashboard: React.FC = () => {
                     <div
                         key={plant.id}
                         onClick={() => navigate(`/plants/${plant.id}`)}
-                        className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer ${plant.status === 'removed' ? 'opacity-50' : ''
+                        className={`bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-6 hover:shadow-lg dark:hover:shadow-gray-900/70 transition-all cursor-pointer ${plant.status === 'removed' ? 'opacity-50' : ''
                             }`}
                     >
                         <div className="flex justify-between items-start mb-4">
-                            <h2 className="text-xl font-bold text-gray-800 flex-grow">
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex-grow">
                                 {highlightMatch(plant.name, searchTerm)}
                             </h2>
                             <div className="flex gap-2 items-center">
@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
                                         e.stopPropagation();
                                         navigate(`/plants/${plant.id}/edit`);
                                     }}
-                                    className="text-blue-600 hover:text-blue-800 p-1"
+                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 p-1"
                                     title="Edit plant"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,8 +184,8 @@ const Dashboard: React.FC = () => {
                                 </button>
                                 <span
                                     className={`px-2 py-1 text-xs rounded ${plant.status === 'active'
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-gray-100 text-gray-800'
+                                        ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                                         }`}
                                 >
                                     {highlightMatch(plant.status, searchTerm)}
@@ -193,7 +193,7 @@ const Dashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="text-sm text-gray-600 space-y-1">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                             <p className="italic">
                                 {highlightMatch(plant.genus, searchTerm)} {highlightMatch(plant.species, searchTerm)}
                                 {plant.species2 && <> × {highlightMatch(plant.species2, searchTerm)}</>}
@@ -203,7 +203,7 @@ const Dashboard: React.FC = () => {
                             <p>Size: {highlightMatch(plant.size, searchTerm)}</p>
 
                             {plant.current_pot && (
-                                <div className="mt-3 pt-3 border-t border-gray-200">
+                                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                                     <p className="font-semibold">📍 {highlightMatch(plant.current_pot.room, searchTerm)}</p>
                                     <p>Pot: {highlightMatch(plant.current_pot.size, searchTerm)} ({highlightMatch(plant.current_pot.qr_code_id, searchTerm)})</p>
                                     {plant.current_soil && (
@@ -213,7 +213,7 @@ const Dashboard: React.FC = () => {
                             )}
 
                             {plant.status === 'removed' && plant.removed_reason && (
-                                <div className="mt-3 pt-3 border-t border-gray-200 text-red-600">
+                                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-red-600 dark:text-red-400">
                                     <p className="text-xs">Removed: {highlightMatch(plant.removed_reason, searchTerm)}</p>
                                 </div>
                             )}
@@ -223,11 +223,11 @@ const Dashboard: React.FC = () => {
             </div>
 
             {filteredPlants.length === 0 && plants.length > 0 && (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
                     <p className="text-xl mb-4">No plants match your search</p>
                     <button
                         onClick={() => setSearchTerm('')}
-                        className="text-green-600 hover:text-green-700 underline"
+                        className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 underline"
                     >
                         Clear search
                     </button>

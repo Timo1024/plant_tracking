@@ -74,33 +74,33 @@ const SoilList: React.FC = () => {
     };
 
     if (loading) {
-        return <div className="text-center py-12">Loading soil mixes...</div>;
+        return <div className="text-center py-12 text-gray-600 dark:text-gray-400">Loading soil mixes...</div>;
     }
 
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Soil Mixes</h1>
+                <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Soil Mixes</h1>
                 <button
                     onClick={() => setShowForm(!showForm)}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    className="bg-green-600 dark:bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
                 >
                     {showForm ? 'Cancel' : '+ Add Soil Mix'}
                 </button>
             </div>
 
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <div className="bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
                     {error}
                 </div>
             )}
 
             {showForm && (
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h2 className="text-xl font-bold mb-4">Add New Soil Mix</h2>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-6 mb-6">
+                    <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Add New Soil Mix</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Mix Name *
                             </label>
                             <input
@@ -109,13 +109,13 @@ const SoilList: React.FC = () => {
                                 required
                                 value={formData.name}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                 placeholder="e.g., Aroid Mix, Succulent Mix"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Composition *
                             </label>
                             <textarea
@@ -124,14 +124,14 @@ const SoilList: React.FC = () => {
                                 value={formData.composition}
                                 onChange={handleChange}
                                 rows={3}
-                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                 placeholder="e.g., 40% bark, 30% perlite, 30% peat moss"
                             />
                         </div>
 
                         <button
                             type="submit"
-                            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+                            className="bg-green-600 dark:bg-green-500 text-white px-6 py-2 rounded hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
                         >
                             Add Soil Mix
                         </button>
@@ -141,19 +141,19 @@ const SoilList: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {soils.map((soil) => (
-                    <div key={soil.id} className="bg-white rounded-lg shadow-md p-6 relative">
+                    <div key={soil.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-6 relative">
                         <button
                             onClick={() => handleDeleteSoil(soil.id, soil.name)}
                             disabled={deletingSoilId === soil.id}
-                            className="absolute top-3 right-3 bg-red-500 hover:bg-red-700 text-white p-1.5 rounded-full disabled:opacity-50 transition-colors"
+                            className="absolute top-3 right-3 bg-red-500 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 text-white p-1.5 rounded-full disabled:opacity-50 transition-colors"
                             title="Delete soil mix"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
-                        <h2 className="text-xl font-bold text-gray-800 mb-2 pr-12">{soil.name}</h2>
-                        <p className="text-gray-600 text-sm whitespace-pre-wrap">
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2 pr-12">{soil.name}</h2>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-wrap">
                             {soil.composition}
                         </p>
                     </div>
@@ -161,11 +161,11 @@ const SoilList: React.FC = () => {
             </div>
 
             {soils.length === 0 && !showForm && (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
                     <p className="text-xl mb-4">No soil mixes yet!</p>
                     <button
                         onClick={() => setShowForm(true)}
-                        className="text-green-600 hover:text-green-700 underline"
+                        className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 underline"
                     >
                         Add your first soil mix
                     </button>
