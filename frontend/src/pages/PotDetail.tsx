@@ -191,7 +191,7 @@ const PotDetail: React.FC = () => {
                     <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
                         <h2 className="text-xl font-bold mb-4">Confirm Pot Deletion</h2>
                         <p className="mb-4">
-                            Are you sure you want to delete pot <strong>{pot?.qr_code_id}</strong>? 
+                            Are you sure you want to delete pot <strong>{pot?.qr_code_id}</strong>?
                             This action cannot be undone.
                         </p>
                         <div className="flex gap-3">

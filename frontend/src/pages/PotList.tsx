@@ -148,8 +148,8 @@ const PotList: React.FC = () => {
                             <button
                                 onClick={() => setFilterStatus('all')}
                                 className={`px-4 py-2 rounded ${filterStatus === 'all'
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
                             >
                                 All
@@ -157,8 +157,8 @@ const PotList: React.FC = () => {
                             <button
                                 onClick={() => setFilterStatus('occupied')}
                                 className={`px-4 py-2 rounded ${filterStatus === 'occupied'
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
                             >
                                 Occupied
@@ -166,8 +166,8 @@ const PotList: React.FC = () => {
                             <button
                                 onClick={() => setFilterStatus('empty')}
                                 className={`px-4 py-2 rounded ${filterStatus === 'empty'
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
                             >
                                 Empty
