@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
+import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import PlantDetail from './pages/PlantDetail';
 import PotDetail from './pages/PotDetail';
@@ -17,7 +18,8 @@ function App() {
                 <Navigation />
                 <main className="container mx-auto px-4 py-8">
                     <Routes>
-                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/" element={<LandingPage />} />
+                        <Route path="/plants" element={<Dashboard />} />
                         <Route path="/plants/:id" element={<PlantDetail />} />
                         <Route path="/plants/:id/edit" element={<EditPlantForm />} />
                         <Route path="/pot/:qrCodeId" element={<PotDetail />} />

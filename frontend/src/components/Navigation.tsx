@@ -11,10 +11,16 @@ const Navigation: React.FC = () => {
                     </Link>
                     <div className="flex space-x-4">
                         <Link to="/" className="hover:bg-green-700 px-3 py-2 rounded">
-                            Dashboard
+                            Home
+                        </Link>
+                        <Link to="/plants" className="hover:bg-green-700 px-3 py-2 rounded">
+                            Plants
                         </Link>
                         <Link to="/pots" className="hover:bg-green-700 px-3 py-2 rounded">
                             Pots
+                        </Link>
+                        <Link to="/soils" className="hover:bg-green-700 px-3 py-2 rounded">
+                            Soils
                         </Link>
                         <Link to="/add-plant" className="hover:bg-green-700 px-3 py-2 rounded">
                             Add Plant
@@ -23,10 +29,7 @@ const Navigation: React.FC = () => {
                             Add Pot
                         </Link>
                         <Link to="/move" className="hover:bg-green-700 px-3 py-2 rounded">
-                            Move Plant
-                        </Link>
-                        <Link to="/soils" className="hover:bg-green-700 px-3 py-2 rounded">
-                            Soils
+                            Move
                         </Link>
                     </div>
                 </div>
