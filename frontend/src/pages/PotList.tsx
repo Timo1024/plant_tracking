@@ -9,21 +9,23 @@ const PotList: React.FC = () => {
     const [filteredPots, setFilteredPots] = useState<Pot[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'occupied' | 'empty'>('all');
+    const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('active');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         fetchPots();
-    }, []);
+    }, [filterActive]);
 
     useEffect(() => {
         applyFilters();
-    }, [searchTerm, filterStatus, pots]);
+    }, [searchTerm, filterStatus, filterActive, pots]);
 
     const fetchPots = async () => {
         try {
             setLoading(true);
-            const response = await potAPI.getAll();
+            const includeInactive = filterActive === 'all' || filterActive === 'inactive';
+            const response = await potAPI.getAll(includeInactive);
             setPots(response.data);
             setError(null);
         } catch (err) {
@@ -36,6 +38,13 @@ const PotList: React.FC = () => {
 
     const applyFilters = () => {
         let filtered = [...pots];
+
+        // Filter by active status
+        if (filterActive === 'active') {
+            filtered = filtered.filter(pot => pot.active);
+        } else if (filterActive === 'inactive') {
+            filtered = filtered.filter(pot => !pot.active);
+        }
 
         // Filter by search term
         if (searchTerm.trim()) {
@@ -52,7 +61,7 @@ const PotList: React.FC = () => {
             );
         }
 
-        // Filter by status
+        // Filter by occupancy status
         if (filterStatus === 'occupied') {
             filtered = filtered.filter(pot => pot.current_plants && pot.current_plants.length > 0);
         } else if (filterStatus === 'empty') {
@@ -127,7 +136,7 @@ const PotList: React.FC = () => {
 
             {/* Filters */}
             <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Search
@@ -142,12 +151,46 @@ const PotList: React.FC = () => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Filter by Status
+                            Pot Status
+                        </label>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setFilterActive('active')}
+                                className={`flex-1 px-3 py-2 rounded text-sm ${filterActive === 'active'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    }`}
+                            >
+                                Active
+                            </button>
+                            <button
+                                onClick={() => setFilterActive('inactive')}
+                                className={`flex-1 px-3 py-2 rounded text-sm ${filterActive === 'inactive'
+                                    ? 'bg-red-600 text-white'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    }`}
+                            >
+                                Inactive
+                            </button>
+                            <button
+                                onClick={() => setFilterActive('all')}
+                                className={`flex-1 px-3 py-2 rounded text-sm ${filterActive === 'all'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    }`}
+                            >
+                                All
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Occupancy
                         </label>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setFilterStatus('all')}
-                                className={`px-4 py-2 rounded ${filterStatus === 'all'
+                                className={`flex-1 px-3 py-2 rounded text-sm ${filterStatus === 'all'
                                     ? 'bg-green-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
@@ -156,7 +199,7 @@ const PotList: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => setFilterStatus('occupied')}
-                                className={`px-4 py-2 rounded ${filterStatus === 'occupied'
+                                className={`flex-1 px-3 py-2 rounded text-sm ${filterStatus === 'occupied'
                                     ? 'bg-green-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
@@ -165,7 +208,7 @@ const PotList: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => setFilterStatus('empty')}
-                                className={`px-4 py-2 rounded ${filterStatus === 'empty'
+                                className={`flex-1 px-3 py-2 rounded text-sm ${filterStatus === 'empty'
                                     ? 'bg-green-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
@@ -204,7 +247,14 @@ const PotList: React.FC = () => {
                                             {pot.qr_code_id}
                                         </div>
                                     </div>
-                                    {getPotStatusBadge(pot)}
+                                    <div className="flex flex-col gap-1 items-end">
+                                        {!pot.active && (
+                                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                                                Inactive
+                                            </span>
+                                        )}
+                                        {getPotStatusBadge(pot)}
+                                    </div>
                                 </div>
 
                                 {/* Pot Details */}

@@ -221,10 +221,19 @@ def remove_plant(plant_id):
 
 @app.route('/api/pots', methods=['GET'])
 def get_pots():
-    """Get all pots"""
+    """Get all pots with optional filter for inactive ones"""
     session = Session()
     try:
-        pots = session.query(Pot).all()
+        # Check if we should include inactive pots
+        include_inactive = request.args.get(
+            'include_inactive', 'false').lower() == 'true'
+
+        if include_inactive:
+            pots = session.query(Pot).all()
+        else:
+            # Only return active pots by default
+            pots = session.query(Pot).filter(Pot.active == True).all()
+
         result = []
 
         for pot in pots:
@@ -363,7 +372,7 @@ def update_pot(pot_id):
 
 @app.route('/api/pots/<int:pot_id>', methods=['DELETE'])
 def delete_pot(pot_id):
-    """Delete a pot (only if it has no plants and no history)"""
+    """Soft delete a pot by marking it as inactive"""
     session = Session()
     try:
         pot = session.query(Pot).filter(Pot.id == pot_id).first()
@@ -379,29 +388,14 @@ def delete_pot(pot_id):
         if current_histories:
             return jsonify({'error': 'Cannot delete pot with current plants. Move or remove plants first.'}), 400
 
-        # Check if pot has any history
-        any_history = session.query(PlantPotHistory).filter(
-            PlantPotHistory.pot_id == pot_id
-        ).first()
-
-        if any_history:
-            return jsonify({'error': 'Cannot delete pot with historical data. Pot has been used before.'}), 400
-
-        # Delete QR code file if it exists
-        try:
-            qr_path = f'static/qrcodes/{pot.qr_code_id}.png'
-            if os.path.exists(qr_path):
-                os.remove(qr_path)
-        except Exception as e:
-            print(f"Error deleting QR code: {e}")
-
-        session.delete(pot)
+        # Soft delete: mark as inactive instead of deleting
+        pot.active = False
         session.commit()
 
-        return jsonify({'message': 'Pot deleted successfully'}), 200
+        return jsonify({'message': 'Pot marked as inactive successfully'}), 200
     except Exception as e:
         session.rollback()
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 500
     finally:
         session.close()
 

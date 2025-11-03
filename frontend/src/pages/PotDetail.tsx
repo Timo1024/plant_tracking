@@ -88,6 +88,13 @@ const PotDetail: React.FC = () => {
                     🪴 Pot Details
                 </h1>
 
+                {!pot.active && (
+                    <div className="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+                        <p className="font-bold">⚠️ This pot is no longer active</p>
+                        <p className="text-sm">This pot has been marked as inactive/deleted but its history is preserved.</p>
+                    </div>
+                )}
+
                 <div className="space-y-4">
                     <div className="border-b pb-4">
                         <p className="text-sm text-gray-600">QR Code ID</p>
@@ -171,8 +178,8 @@ const PotDetail: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Delete Pot Button - Only show for empty pots */}
-                    {(!pot.current_plants || pot.current_plants.length === 0) && (
+                    {/* Delete Pot Button - Only show for empty and active pots */}
+                    {pot.active && (!pot.current_plants || pot.current_plants.length === 0) && (
                         <div className="mt-6 pt-6 border-t">
                             <button
                                 onClick={() => setShowDeletePotConfirm(true)}
@@ -189,10 +196,13 @@ const PotDetail: React.FC = () => {
             {showDeletePotConfirm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                        <h2 className="text-xl font-bold mb-4">Confirm Pot Deletion</h2>
+                        <h2 className="text-xl font-bold mb-4">Mark Pot as Inactive</h2>
                         <p className="mb-4">
-                            Are you sure you want to delete pot <strong>{pot?.qr_code_id}</strong>?
-                            This action cannot be undone.
+                            Are you sure you want to mark pot <strong>{pot?.qr_code_id}</strong> as inactive?
+                        </p>
+                        <p className="mb-4 text-sm text-gray-600">
+                            The pot will be hidden from the pot list but its history will be preserved.
+                            It can still be accessed via its QR code for reference.
                         </p>
                         <div className="flex gap-3">
                             <button
@@ -207,7 +217,7 @@ const PotDetail: React.FC = () => {
                                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
                                 disabled={deleting}
                             >
-                                {deleting ? 'Deleting...' : 'Delete Pot'}
+                                {deleting ? 'Processing...' : 'Mark Inactive'}
                             </button>
                         </div>
                     </div>

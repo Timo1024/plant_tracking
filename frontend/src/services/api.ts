@@ -21,7 +21,7 @@ export const plantAPI = {
 
 // Pot API
 export const potAPI = {
-    getAll: () => api.get<Pot[]>('/pots'),
+    getAll: (includeInactive: boolean = false) => api.get<Pot[]>('/pots', { params: { include_inactive: includeInactive } }),
     getByQRCode: (qrCodeId: string) => api.get<Pot>(`/pots/${qrCodeId}`),
     create: (pot: Partial<Pot>) => api.post<Pot>('/pots', pot),
     update: (id: number, pot: Partial<Pot>) => api.put<Pot>(`/pots/${id}`, pot),
