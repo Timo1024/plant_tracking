@@ -361,6 +361,51 @@ def update_pot(pot_id):
         session.close()
 
 
+@app.route('/api/pots/<int:pot_id>', methods=['DELETE'])
+def delete_pot(pot_id):
+    """Delete a pot (only if it has no plants and no history)"""
+    session = Session()
+    try:
+        pot = session.query(Pot).filter(Pot.id == pot_id).first()
+        if not pot:
+            return jsonify({'error': 'Pot not found'}), 404
+
+        # Check if pot has any current plants
+        current_histories = session.query(PlantPotHistory).filter(
+            and_(PlantPotHistory.pot_id == pot_id,
+                 PlantPotHistory.end_date.is_(None))
+        ).first()
+
+        if current_histories:
+            return jsonify({'error': 'Cannot delete pot with current plants. Move or remove plants first.'}), 400
+
+        # Check if pot has any history
+        any_history = session.query(PlantPotHistory).filter(
+            PlantPotHistory.pot_id == pot_id
+        ).first()
+
+        if any_history:
+            return jsonify({'error': 'Cannot delete pot with historical data. Pot has been used before.'}), 400
+
+        # Delete QR code file if it exists
+        try:
+            qr_path = f'static/qrcodes/{pot.qr_code_id}.png'
+            if os.path.exists(qr_path):
+                os.remove(qr_path)
+        except Exception as e:
+            print(f"Error deleting QR code: {e}")
+
+        session.delete(pot)
+        session.commit()
+
+        return jsonify({'message': 'Pot deleted successfully'}), 200
+    except Exception as e:
+        session.rollback()
+        return jsonify({'error': str(e)}), 400
+    finally:
+        session.close()
+
+
 # ============== SOIL ROUTES ==============
 
 @app.route('/api/soils', methods=['GET'])
@@ -416,6 +461,43 @@ def update_soil(soil_id):
         session.commit()
 
         return jsonify(soil.to_dict()), 200
+    except Exception as e:
+        session.rollback()
+        return jsonify({'error': str(e)}), 400
+    finally:
+        session.close()
+
+
+@app.route('/api/soils/<int:soil_id>', methods=['DELETE'])
+def delete_soil(soil_id):
+    """Delete a soil mix (only if not in use)"""
+    session = Session()
+    try:
+        soil = session.query(Soil).filter(Soil.id == soil_id).first()
+        if not soil:
+            return jsonify({'error': 'Soil not found'}), 404
+
+        # Check if soil is currently in use
+        in_use = session.query(PlantPotHistory).filter(
+            and_(PlantPotHistory.soil_id == soil_id,
+                 PlantPotHistory.end_date.is_(None))
+        ).first()
+
+        if in_use:
+            return jsonify({'error': 'Cannot delete soil mix that is currently in use. Move plants to different soil first.'}), 400
+
+        # Check if soil has any history
+        any_history = session.query(PlantPotHistory).filter(
+            PlantPotHistory.soil_id == soil_id
+        ).first()
+
+        if any_history:
+            return jsonify({'error': 'Cannot delete soil mix with historical data. It has been used before.'}), 400
+
+        session.delete(soil)
+        session.commit()
+
+        return jsonify({'message': 'Soil mix deleted successfully'}), 200
     except Exception as e:
         session.rollback()
         return jsonify({'error': str(e)}), 400

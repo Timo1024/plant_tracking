@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { potAPI } from '../services/api';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { potAPI, plantAPI } from '../services/api';
 import { Pot } from '../types';
 
 const PotDetail: React.FC = () => {
     const { qrCodeId } = useParams<{ qrCodeId: string }>();
+    const navigate = useNavigate();
     const [pot, setPot] = useState<Pot | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showDeletePotConfirm, setShowDeletePotConfirm] = useState(false);
+    const [showDeletePlantConfirm, setShowDeletePlantConfirm] = useState(false);
+    const [selectedPlantId, setSelectedPlantId] = useState<number | null>(null);
+    const [deleteReason, setDeleteReason] = useState('');
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         if (qrCodeId) {
@@ -26,6 +32,40 @@ const PotDetail: React.FC = () => {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDeletePot = async () => {
+        if (!pot) return;
+
+        try {
+            setDeleting(true);
+            await potAPI.delete(pot.id);
+            navigate('/pots');
+        } catch (err: any) {
+            alert(err.response?.data?.error || 'Failed to delete pot');
+            setShowDeletePotConfirm(false);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const handleDeletePlant = async () => {
+        if (!selectedPlantId || !deleteReason.trim()) return;
+
+        try {
+            setDeleting(true);
+            await plantAPI.remove(selectedPlantId, deleteReason);
+            if (qrCodeId) {
+                await fetchPot(qrCodeId);
+            }
+            setShowDeletePlantConfirm(false);
+            setSelectedPlantId(null);
+            setDeleteReason('');
+        } catch (err: any) {
+            alert(err.response?.data?.error || 'Failed to delete plant');
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -79,19 +119,32 @@ const PotDetail: React.FC = () => {
                             <div className="space-y-6">
                                 {pot.current_plants.map((plant, index) => (
                                     <div key={plant.id} className={index > 0 ? 'pt-6 border-t border-green-200' : ''}>
-                                        <Link to={`/plants/${plant.id}`} className="text-xl font-semibold text-green-700 hover:text-green-900">
-                                            {plant.name}
-                                        </Link>
-                                        <p className="italic text-gray-700">
-                                            {plant.genus} {plant.species}
-                                            {plant.species2 && ` × ${plant.species2}`}
-                                        </p>
-                                        <p className="text-gray-600">
-                                            Family: {plant.family}
-                                        </p>
-                                        <p className="text-gray-600 capitalize">
-                                            Size: {plant.size}
-                                        </p>
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1">
+                                                <Link to={`/plants/${plant.id}`} className="text-xl font-semibold text-green-700 hover:text-green-900">
+                                                    {plant.name}
+                                                </Link>
+                                                <p className="italic text-gray-700">
+                                                    {plant.genus} {plant.species}
+                                                    {plant.species2 && ` × ${plant.species2}`}
+                                                </p>
+                                                <p className="text-gray-600">
+                                                    Family: {plant.family}
+                                                </p>
+                                                <p className="text-gray-600 capitalize">
+                                                    Size: {plant.size}
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedPlantId(plant.id);
+                                                    setShowDeletePlantConfirm(true);
+                                                }}
+                                                className="ml-4 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                                            >
+                                                Remove Plant
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                                 {pot.current_soil && (
@@ -117,8 +170,88 @@ const PotDetail: React.FC = () => {
                             </p>
                         </div>
                     )}
+
+                    {/* Delete Pot Button - Only show for empty pots */}
+                    {(!pot.current_plants || pot.current_plants.length === 0) && (
+                        <div className="mt-6 pt-6 border-t">
+                            <button
+                                onClick={() => setShowDeletePotConfirm(true)}
+                                className="w-full bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded"
+                            >
+                                Delete Pot
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            {/* Delete Pot Confirmation Modal */}
+            {showDeletePotConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                        <h2 className="text-xl font-bold mb-4">Confirm Pot Deletion</h2>
+                        <p className="mb-4">
+                            Are you sure you want to delete pot <strong>{pot?.qr_code_id}</strong>? 
+                            This action cannot be undone.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowDeletePotConfirm(false)}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+                                disabled={deleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeletePot}
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                                disabled={deleting}
+                            >
+                                {deleting ? 'Deleting...' : 'Delete Pot'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Plant Confirmation Modal */}
+            {showDeletePlantConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                        <h2 className="text-xl font-bold mb-4">Remove Plant</h2>
+                        <p className="mb-4">
+                            Please provide a reason for removing this plant:
+                        </p>
+                        <textarea
+                            value={deleteReason}
+                            onChange={(e) => setDeleteReason(e.target.value)}
+                            className="w-full border border-gray-300 rounded px-3 py-2 mb-4 min-h-24"
+                            placeholder="e.g., Plant died, Gave away, Sold, etc."
+                            disabled={deleting}
+                        />
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowDeletePlantConfirm(false);
+                                    setSelectedPlantId(null);
+                                    setDeleteReason('');
+                                }}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+                                disabled={deleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeletePlant}
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                                disabled={deleting || !deleteReason.trim()}
+                            >
+                                {deleting ? 'Removing...' : 'Remove Plant'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

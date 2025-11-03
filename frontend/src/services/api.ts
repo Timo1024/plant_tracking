@@ -25,6 +25,7 @@ export const potAPI = {
     getByQRCode: (qrCodeId: string) => api.get<Pot>(`/pots/${qrCodeId}`),
     create: (pot: Partial<Pot>) => api.post<Pot>('/pots', pot),
     update: (id: number, pot: Partial<Pot>) => api.put<Pot>(`/pots/${id}`, pot),
+    delete: (id: number) => api.delete(`/pots/${id}`),
 };
 
 // Soil API
@@ -32,6 +33,7 @@ export const soilAPI = {
     getAll: () => api.get<Soil[]>('/soils'),
     create: (soil: Partial<Soil>) => api.post<Soil>('/soils', soil),
     update: (id: number, soil: Partial<Soil>) => api.put<Soil>(`/soils/${id}`, soil),
+    delete: (id: number) => api.delete(`/soils/${id}`),
 };
 
 // History / Movement API

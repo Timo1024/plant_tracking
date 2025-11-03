@@ -70,11 +70,10 @@ const PotList: React.FC = () => {
     };
 
     const getPotStatusBadge = (pot: Pot) => {
-        const plantCount = pot.current_plants?.length || 0;
-        if (plantCount === 0) {
-            return <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">Empty</span>;
-        }
-        return <span className="px-2 py-1 bg-green-200 text-green-700 text-xs rounded-full">{plantCount} plant{plantCount > 1 ? 's' : ''}</span>;
+        const count = pot.current_plants?.length || 0;
+        return count > 0 ? (
+            <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full">{count} plant{count !== 1 ? 's' : ''}</span>
+        ) : <span className="bg-gray-400 text-white text-xs px-2 py-1 rounded-full">Empty</span>;
     };
 
     if (loading) {
@@ -199,7 +198,7 @@ const PotList: React.FC = () => {
                             <div className="p-4">
                                 {/* Header */}
                                 <div className="flex justify-between items-start mb-3">
-                                    <div className="flex-1">
+                                    <div className="flex-1 pr-2">
                                         <div className="text-xs text-gray-500 mb-1">QR Code</div>
                                         <div className="font-mono font-bold text-lg text-gray-800">
                                             {pot.qr_code_id}
