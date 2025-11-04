@@ -11,12 +11,18 @@ const QRScanner: React.FC<QRScannerProps> = ({ onClose }) => {
     const [manualInput, setManualInput] = useState('');
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
+    const scanningRef = useRef<boolean>(true);
+    const lastScanTimeRef = useRef<number>(0);
 
-    // Start camera
+    // Start camera with optimized settings
     const startCamera = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' } // Use back camera on mobile
+                video: {
+                    facingMode: 'environment', // Use back camera on mobile
+                    width: { ideal: 1920 }, // Higher resolution for better QR detection
+                    height: { ideal: 1080 },
+                }
             });
 
             if (videoRef.current) {
@@ -31,6 +37,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onClose }) => {
 
     // Stop camera
     const stopCamera = () => {
+        scanningRef.current = false;
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
             streamRef.current = null;
@@ -47,15 +54,32 @@ const QRScanner: React.FC<QRScannerProps> = ({ onClose }) => {
         }
     };
 
-    // Scan QR code from video frame
+    // Scan QR code from video frame - optimized version
     const scanQRCode = async () => {
-        if (!videoRef.current) return;
+        if (!videoRef.current || !scanningRef.current) return;
+
+        const now = Date.now();
+        // Scan every 100ms instead of every frame for better performance
+        if (now - lastScanTimeRef.current < 100) {
+            requestAnimationFrame(scanQRCode);
+            return;
+        }
+        lastScanTimeRef.current = now;
 
         const video = videoRef.current;
+
+        // Skip if video not ready
+        if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+            requestAnimationFrame(scanQRCode);
+            return;
+        }
+
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
+        // Use smaller canvas for faster processing
+        const scale = 0.5; // Process at half resolution
+        canvas.width = video.videoWidth * scale;
+        canvas.height = video.videoHeight * scale;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
         if (ctx) {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -74,9 +98,11 @@ const QRScanner: React.FC<QRScannerProps> = ({ onClose }) => {
                         const match = qrCode.match(/\/pot\/([^\/\?]+)/);
                         const potId = match ? match[1] : qrCode;
 
+                        scanningRef.current = false;
                         stopCamera();
                         navigate(`/pot/${potId}`);
                         onClose();
+                        return;
                     }
                 }
             } catch (err) {
@@ -85,7 +111,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onClose }) => {
         }
 
         // Continue scanning
-        if (streamRef.current) {
+        if (scanningRef.current && streamRef.current) {
             requestAnimationFrame(scanQRCode);
         }
     };
