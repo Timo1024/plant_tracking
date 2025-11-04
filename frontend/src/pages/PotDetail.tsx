@@ -14,6 +14,9 @@ const PotDetail: React.FC = () => {
     const [selectedPlantId, setSelectedPlantId] = useState<number | null>(null);
     const [deleteReason, setDeleteReason] = useState('');
     const [deleting, setDeleting] = useState(false);
+    const [editingLocation, setEditingLocation] = useState(false);
+    const [newLocation, setNewLocation] = useState('');
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         if (qrCodeId) {
@@ -69,6 +72,33 @@ const PotDetail: React.FC = () => {
         }
     };
 
+    const handleEditLocation = () => {
+        if (!pot) return;
+        setNewLocation(pot.room);
+        setEditingLocation(true);
+    };
+
+    const handleSaveLocation = async () => {
+        if (!pot || !newLocation.trim()) return;
+
+        setSaving(true);
+        try {
+            await potAPI.update(pot.id, { room: newLocation.trim() });
+            setPot({ ...pot, room: newLocation.trim() });
+            setEditingLocation(false);
+        } catch (err) {
+            console.error('Failed to update location:', err);
+            alert('Failed to update location. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingLocation(false);
+        setNewLocation('');
+    };
+
     if (loading) {
         return <div className="text-center py-12">Loading pot details...</div>;
     }
@@ -110,8 +140,51 @@ const PotDetail: React.FC = () => {
                     </div>
 
                     <div className="border-b pb-4">
-                        <p className="text-sm text-gray-600">Location</p>
-                        <p className="text-2xl">{pot.room}</p>
+                        <div className="flex justify-between items-start mb-2">
+                            <p className="text-sm text-gray-600">Location</p>
+                            {!editingLocation && (
+                                <button
+                                    onClick={handleEditLocation}
+                                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Edit
+                                </button>
+                            )}
+                        </div>
+
+                        {editingLocation ? (
+                            <div className="space-y-3">
+                                <input
+                                    type="text"
+                                    value={newLocation}
+                                    onChange={(e) => setNewLocation(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter room/location"
+                                    autoFocus
+                                />
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleSaveLocation}
+                                        disabled={saving || !newLocation.trim()}
+                                        className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+                                    >
+                                        {saving ? 'Saving...' : '✓ Save'}
+                                    </button>
+                                    <button
+                                        onClick={handleCancelEdit}
+                                        disabled={saving}
+                                        className="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+                                    >
+                                        ✕ Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-2xl">{pot.room}</p>
+                        )}
                     </div>
 
                     <div className="border-b pb-4">
