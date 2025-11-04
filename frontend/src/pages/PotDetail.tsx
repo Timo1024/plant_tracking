@@ -139,6 +139,39 @@ const PotDetail: React.FC = () => {
                         <p className="text-2xl font-mono">{pot.qr_code_id}</p>
                     </div>
 
+                    {/* QR Code Display and Download */}
+                    <div className="border-b pb-4">
+                        <p className="text-sm text-gray-600 mb-3">QR Code</p>
+                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                            <div className="bg-white p-3 rounded-lg border-2 border-gray-200 shadow-sm">
+                                <img
+                                    src={`/qrcodes/${pot.qr_code_id}.png?t=${Date.now()}`}
+                                    alt={`QR Code for ${pot.qr_code_id}`}
+                                    className="w-48 h-48 object-contain"
+                                    onError={(e) => {
+                                        console.error('QR Code failed to load:', `/qrcodes/${pot.qr_code_id}.png`);
+                                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect width="200" height="200" fill="%23f3f4f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%236b7280" font-size="12"%3EQR Code Not Found%3C/text%3E%3C/svg%3E';
+                                    }}
+                                    onLoad={() => console.log('QR Code loaded successfully')}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2 w-full sm:w-auto">
+                                <a
+                                    href={`/qrcodes/${pot.qr_code_id}.png`}
+                                    download={`pot-${pot.qr_code_id}.png`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-medium"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Download QR Code
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="border-b pb-4">
                         <div className="flex justify-between items-start mb-2">
                             <p className="text-sm text-gray-600">Location</p>
