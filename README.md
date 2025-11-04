@@ -6,10 +6,12 @@ A full-stack web application for tracking plants and their pot assignments over 
 
 - **Plant Management**: Add, edit, and track plants with detailed botanical information
 - **Pot Tracking**: Manage pots with unique QR codes for easy identification
+- **📷 QR Code Scanner**: Built-in camera scanner for instant pot access (mobile & desktop)
 - **Soil Mixes**: Create and reuse custom soil mix compositions
 - **Movement History**: Automatically track plant movements between pots
 - **QR Code Integration**: Each pot has a scannable QR code linking to its details
 - **Responsive UI**: Mobile-friendly interface built with React and Tailwind CSS
+- **Quick Actions**: Move or remove plants directly from scanned pot view
 
 ## 🏗️ Architecture
 
