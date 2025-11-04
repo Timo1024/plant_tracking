@@ -76,6 +76,7 @@ class Soil(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), nullable=False)
     composition = Column(Text, nullable=False)
+    active = Column(Boolean, default=True, nullable=False)
 
     # Relationships
     history = relationship('PlantPotHistory', back_populates='soil')
@@ -84,7 +85,8 @@ class Soil(Base):
         return {
             'id': self.id,
             'name': self.name,
-            'composition': self.composition
+            'composition': self.composition,
+            'active': self.active
         }
 
 

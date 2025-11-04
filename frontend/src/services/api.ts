@@ -30,7 +30,7 @@ export const potAPI = {
 
 // Soil API
 export const soilAPI = {
-    getAll: () => api.get<Soil[]>('/soils'),
+    getAll: (includeInactive: boolean = false) => api.get<Soil[]>('/soils', { params: { include_inactive: includeInactive } }),
     create: (soil: Partial<Soil>) => api.post<Soil>('/soils', soil),
     update: (id: number, soil: Partial<Soil>) => api.put<Soil>(`/soils/${id}`, soil),
     delete: (id: number) => api.delete(`/soils/${id}`),

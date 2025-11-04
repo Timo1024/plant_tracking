@@ -8,6 +8,7 @@ const SoilList: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [deletingSoilId, setDeletingSoilId] = useState<number | null>(null);
+    const [showInactive, setShowInactive] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         composition: '',
@@ -15,12 +16,12 @@ const SoilList: React.FC = () => {
 
     useEffect(() => {
         fetchSoils();
-    }, []);
+    }, [showInactive]);
 
     const fetchSoils = async () => {
         try {
             setLoading(true);
-            const response = await soilAPI.getAll();
+            const response = await soilAPI.getAll(showInactive);
             setSoils(response.data);
             setError(null);
         } catch (err) {
@@ -55,7 +56,7 @@ const SoilList: React.FC = () => {
     };
 
     const handleDeleteSoil = async (soilId: number, soilName: string) => {
-        if (!window.confirm(`Are you sure you want to delete "${soilName}"? This can only be done if the soil mix has never been used.`)) {
+        if (!window.confirm(`Are you sure you want to delete "${soilName}"? It will be marked as deleted but still visible in history.`)) {
             return;
         }
 
@@ -73,6 +74,25 @@ const SoilList: React.FC = () => {
         }
     };
 
+    const handleRestoreSoil = async (soilId: number, soilName: string) => {
+        if (!window.confirm(`Restore "${soilName}"?`)) {
+            return;
+        }
+
+        try {
+            setDeletingSoilId(soilId);
+            await soilAPI.update(soilId, { active: true });
+            // Refresh the soil list
+            await fetchSoils();
+            setError(null);
+        } catch (err: any) {
+            setError(err.response?.data?.error || 'Failed to restore soil mix');
+            console.error(err);
+        } finally {
+            setDeletingSoilId(null);
+        }
+    };
+
     if (loading) {
         return <div className="text-center py-12">Loading soil mixes...</div>;
     }
@@ -81,12 +101,23 @@ const SoilList: React.FC = () => {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">Soil Mixes</h1>
-                <button
-                    onClick={() => setShowForm(!showForm)}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                >
-                    {showForm ? 'Cancel' : '+ Add Soil Mix'}
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => setShowInactive(!showInactive)}
+                        className={`px-4 py-2 rounded transition-colors ${showInactive
+                                ? 'bg-gray-600 text-white hover:bg-gray-700'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                    >
+                        {showInactive ? 'Hide Deleted' : 'Show Deleted'}
+                    </button>
+                    <button
+                        onClick={() => setShowForm(!showForm)}
+                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    >
+                        {showForm ? 'Cancel' : '+ Add Soil Mix'}
+                    </button>
+                </div>
             </div>
 
             {error && (
@@ -141,18 +172,44 @@ const SoilList: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {soils.map((soil) => (
-                    <div key={soil.id} className="bg-white rounded-lg shadow-md p-6 relative">
-                        <button
-                            onClick={() => handleDeleteSoil(soil.id, soil.name)}
-                            disabled={deletingSoilId === soil.id}
-                            className="absolute top-3 right-3 bg-red-500 hover:bg-red-700 text-white p-1.5 rounded-full disabled:opacity-50 transition-colors"
-                            title="Delete soil mix"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                        <h2 className="text-xl font-bold text-gray-800 mb-2 pr-12">{soil.name}</h2>
+                    <div
+                        key={soil.id}
+                        className={`bg-white rounded-lg shadow-md p-6 relative ${!soil.active ? 'opacity-60 border-2 border-red-300' : ''
+                            }`}
+                    >
+                        {soil.active ? (
+                            <button
+                                onClick={() => handleDeleteSoil(soil.id, soil.name)}
+                                disabled={deletingSoilId === soil.id}
+                                className="absolute top-3 right-3 bg-red-500 hover:bg-red-700 text-white p-1.5 rounded-full disabled:opacity-50 transition-colors"
+                                title="Delete soil mix"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => handleRestoreSoil(soil.id, soil.name)}
+                                disabled={deletingSoilId === soil.id}
+                                className="absolute top-3 right-3 bg-green-500 hover:bg-green-700 text-white p-1.5 rounded-full disabled:opacity-50 transition-colors"
+                                title="Restore soil mix"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </button>
+                        )}
+
+                        {!soil.active && (
+                            <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                                DELETED
+                            </span>
+                        )}
+
+                        <h2 className="text-xl font-bold text-gray-800 mb-2 pr-12">
+                            {soil.name}
+                        </h2>
                         <p className="text-gray-600 text-sm whitespace-pre-wrap">
                             {soil.composition}
                         </p>
@@ -162,13 +219,15 @@ const SoilList: React.FC = () => {
 
             {soils.length === 0 && !showForm && (
                 <div className="text-center py-12 text-gray-500">
-                    <p className="text-xl mb-4">No soil mixes yet!</p>
-                    <button
-                        onClick={() => setShowForm(true)}
-                        className="text-green-600 hover:text-green-700 underline"
-                    >
-                        Add your first soil mix
-                    </button>
+                    <p className="text-xl mb-4">{showInactive ? 'No deleted soil mixes!' : 'No soil mixes yet!'}</p>
+                    {!showInactive && (
+                        <button
+                            onClick={() => setShowForm(true)}
+                            className="text-green-600 hover:text-green-700 underline"
+                        >
+                            Add your first soil mix
+                        </button>
+                    )}
                 </div>
             )}
         </div>

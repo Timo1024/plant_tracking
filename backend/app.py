@@ -404,10 +404,17 @@ def delete_pot(pot_id):
 
 @app.route('/api/soils', methods=['GET'])
 def get_soils():
-    """Get all soil mixes"""
+    """Get all soil mixes (optionally include inactive)"""
     session = Session()
     try:
-        soils = session.query(Soil).all()
+        include_inactive = request.args.get(
+            'include_inactive', 'false').lower() == 'true'
+
+        if include_inactive:
+            soils = session.query(Soil).all()
+        else:
+            soils = session.query(Soil).filter(Soil.active == True).all()
+
         return jsonify([soil.to_dict() for soil in soils]), 200
     finally:
         session.close()
@@ -438,7 +445,7 @@ def add_soil():
 
 @app.route('/api/soils/<int:soil_id>', methods=['PUT'])
 def update_soil(soil_id):
-    """Update soil mix"""
+    """Update soil mix (including active status for restore)"""
     session = Session()
     try:
         soil = session.query(Soil).filter(Soil.id == soil_id).first()
@@ -451,6 +458,8 @@ def update_soil(soil_id):
             soil.name = data['name']
         if 'composition' in data:
             soil.composition = data['composition']
+        if 'active' in data:
+            soil.active = data['active']
 
         session.commit()
 
@@ -464,34 +473,18 @@ def update_soil(soil_id):
 
 @app.route('/api/soils/<int:soil_id>', methods=['DELETE'])
 def delete_soil(soil_id):
-    """Delete a soil mix (only if not in use)"""
+    """Soft delete a soil mix (mark as inactive)"""
     session = Session()
     try:
         soil = session.query(Soil).filter(Soil.id == soil_id).first()
         if not soil:
             return jsonify({'error': 'Soil not found'}), 404
 
-        # Check if soil is currently in use
-        in_use = session.query(PlantPotHistory).filter(
-            and_(PlantPotHistory.soil_id == soil_id,
-                 PlantPotHistory.end_date.is_(None))
-        ).first()
-
-        if in_use:
-            return jsonify({'error': 'Cannot delete soil mix that is currently in use. Move plants to different soil first.'}), 400
-
-        # Check if soil has any history
-        any_history = session.query(PlantPotHistory).filter(
-            PlantPotHistory.soil_id == soil_id
-        ).first()
-
-        if any_history:
-            return jsonify({'error': 'Cannot delete soil mix with historical data. It has been used before.'}), 400
-
-        session.delete(soil)
+        # Soft delete - just mark as inactive
+        soil.active = False
         session.commit()
 
-        return jsonify({'message': 'Soil mix deleted successfully'}), 200
+        return jsonify({'message': 'Soil mix marked as deleted successfully'}), 200
     except Exception as e:
         session.rollback()
         return jsonify({'error': str(e)}), 400

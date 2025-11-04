@@ -33,6 +33,7 @@ export interface Soil {
     id: number;
     name: string;
     composition: string;
+    active: boolean;
 }
 
 export interface PlantPotHistory {
