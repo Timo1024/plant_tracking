@@ -89,7 +89,8 @@ const LandingPage: React.FC = () => {
     }) => (
         <button
             onClick={onClick}
-            className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left w-full border-t-4 ${color} hover:scale-103 transform transition-transform`} // scale-105
+            // className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left w-full border-t-4 ${color} hover:scale-103 transform transition-transform`} // scale-105
+            className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg hover:scale-103 transform transition-all duration-300 ease-out text-left w-full border-t-4 ${color}`}
         >
             <div className="flex items-start space-x-4">
                 <div className="text-4xl">{icon}</div>
