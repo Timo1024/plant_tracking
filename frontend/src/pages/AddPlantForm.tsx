@@ -144,16 +144,16 @@ const AddPlantForm: React.FC = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Add New Plant</h1>
+        <div className="max-w-2xl mx-auto px-4 sm:px-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Add New Plant</h1>
 
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm sm:text-base">
                     {error}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-4" autoComplete="off">
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-4 sm:p-6 space-y-4" autoComplete="off">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Common Name *

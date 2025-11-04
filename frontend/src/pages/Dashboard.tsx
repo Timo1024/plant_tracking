@@ -108,11 +108,11 @@ const Dashboard: React.FC = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Plant Dashboard</h1>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Plant Dashboard</h1>
                 <Link
                     to="/add-plant"
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded hover:bg-green-700 text-sm sm:text-base w-full sm:w-auto text-center"
                 >
                     + Add New Plant
                 </Link>
@@ -126,7 +126,7 @@ const Dashboard: React.FC = () => {
                         placeholder="Search plants by name, species, pot, room, soil, or QR code..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
                     />
                     <svg
                         className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"

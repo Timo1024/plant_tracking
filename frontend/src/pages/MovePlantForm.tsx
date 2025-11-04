@@ -187,17 +187,17 @@ const MovePlantForm: React.FC = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Move Plant Between Pots</h1>
+        <div className="max-w-2xl mx-auto px-4 sm:px-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Move Plant Between Pots</h1>
 
-            <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
-                <p className="text-sm text-blue-800">
+            <div className="bg-blue-50 border border-blue-200 rounded p-3 sm:p-4 mb-6">
+                <p className="text-xs sm:text-sm text-blue-800">
                     💡 <strong>Tip:</strong> Scan or enter the QR code from the pot labels to identify pots quickly.
                 </p>
             </div>
 
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm sm:text-base">
                     {error}
                 </div>
             )}

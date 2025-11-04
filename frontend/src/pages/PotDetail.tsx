@@ -82,16 +82,16 @@ const PotDetail: React.FC = () => {
     }
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-                <h1 className="text-4xl font-bold text-gray-800 mb-6">
+        <div className="max-w-2xl mx-auto px-4 sm:px-0">
+            <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8">
+                <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-6">
                     🪴 Pot Details
                 </h1>
 
                 {!pot.active && (
-                    <div className="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-                        <p className="font-bold">⚠️ This pot is no longer active</p>
-                        <p className="text-sm">This pot has been marked as inactive/deleted but its history is preserved.</p>
+                    <div className="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 sm:p-4 rounded">
+                        <p className="font-bold text-sm sm:text-base">⚠️ This pot is no longer active</p>
+                        <p className="text-xs sm:text-sm">This pot has been marked as inactive/deleted but its history is preserved.</p>
                     </div>
                 )}
 

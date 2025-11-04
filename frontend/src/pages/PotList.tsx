@@ -103,11 +103,11 @@ const PotList: React.FC = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">🪴 Pot Overview</h1>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">🪴 Pot Overview</h1>
                 <button
                     onClick={() => navigate('/add-pot')}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center"
                 >
                     <span>➕</span>
                     Add New Pot
@@ -115,30 +115,30 @@ const PotList: React.FC = () => {
             </div>
 
             {/* Stats Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-white rounded-lg shadow p-4">
-                    <div className="text-2xl font-bold text-gray-800">{pots.length}</div>
-                    <div className="text-gray-600">Total Pots</div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+                <div className="bg-white rounded-lg shadow p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-gray-800">{pots.length}</div>
+                    <div className="text-xs sm:text-sm text-gray-600">Total Pots</div>
                 </div>
-                <div className="bg-green-50 rounded-lg shadow p-4">
-                    <div className="text-2xl font-bold text-green-700">
+                <div className="bg-green-50 rounded-lg shadow p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-green-700">
                         {pots.filter(p => p.current_plants && p.current_plants.length > 0).length}
                     </div>
-                    <div className="text-gray-600">Occupied</div>
+                    <div className="text-xs sm:text-sm text-gray-600">Occupied</div>
                 </div>
-                <div className="bg-gray-50 rounded-lg shadow p-4">
-                    <div className="text-2xl font-bold text-gray-700">
+                <div className="bg-gray-50 rounded-lg shadow p-3 sm:p-4 col-span-2 sm:col-span-1">
+                    <div className="text-xl sm:text-2xl font-bold text-gray-700">
                         {pots.filter(p => !p.current_plants || p.current_plants.length === 0).length}
                     </div>
-                    <div className="text-gray-600">Empty</div>
+                    <div className="text-xs sm:text-sm text-gray-600">Empty</div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-6">
+                <div className="grid grid-cols-1 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                             Search
                         </label>
                         <input
@@ -146,17 +146,17 @@ const PotList: React.FC = () => {
                             placeholder="Search by QR code, room, size, or plant..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                             Pot Status
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1 sm:gap-2">
                             <button
                                 onClick={() => setFilterActive('active')}
-                                className={`flex-1 px-3 py-2 rounded text-sm ${filterActive === 'active'
+                                className={`flex-1 px-2 sm:px-3 py-2 rounded text-xs sm:text-sm ${filterActive === 'active'
                                     ? 'bg-green-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
@@ -165,7 +165,7 @@ const PotList: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => setFilterActive('inactive')}
-                                className={`flex-1 px-3 py-2 rounded text-sm ${filterActive === 'inactive'
+                                className={`flex-1 px-2 sm:px-3 py-2 rounded text-xs sm:text-sm ${filterActive === 'inactive'
                                     ? 'bg-red-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
@@ -174,7 +174,7 @@ const PotList: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => setFilterActive('all')}
-                                className={`flex-1 px-3 py-2 rounded text-sm ${filterActive === 'all'
+                                className={`flex-1 px-2 sm:px-3 py-2 rounded text-xs sm:text-sm ${filterActive === 'all'
                                     ? 'bg-blue-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
@@ -184,13 +184,13 @@ const PotList: React.FC = () => {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                             Occupancy
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1 sm:gap-2">
                             <button
                                 onClick={() => setFilterStatus('all')}
-                                className={`flex-1 px-3 py-2 rounded text-sm ${filterStatus === 'all'
+                                className={`flex-1 px-2 sm:px-3 py-2 rounded text-xs sm:text-sm ${filterStatus === 'all'
                                     ? 'bg-green-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
@@ -199,7 +199,7 @@ const PotList: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => setFilterStatus('occupied')}
-                                className={`flex-1 px-3 py-2 rounded text-sm ${filterStatus === 'occupied'
+                                className={`flex-1 px-2 sm:px-3 py-2 rounded text-xs sm:text-sm ${filterStatus === 'occupied'
                                     ? 'bg-green-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
@@ -208,7 +208,7 @@ const PotList: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => setFilterStatus('empty')}
-                                className={`flex-1 px-3 py-2 rounded text-sm ${filterStatus === 'empty'
+                                className={`flex-1 px-2 sm:px-3 py-2 rounded text-xs sm:text-sm ${filterStatus === 'empty'
                                     ? 'bg-green-600 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}

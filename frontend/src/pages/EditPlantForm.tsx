@@ -109,16 +109,16 @@ const EditPlantForm: React.FC = () => {
     }
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">Edit Plant</h1>
+        <div className="max-w-2xl mx-auto px-4 sm:px-0">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-6">Edit Plant</h1>
 
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm sm:text-base">
                     {error}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8" autoComplete="off">
+            <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-4 sm:px-8 pt-6 pb-8" autoComplete="off">
                 {/* Plant Name */}
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">

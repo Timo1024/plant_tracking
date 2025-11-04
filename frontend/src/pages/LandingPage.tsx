@@ -68,14 +68,14 @@ const LandingPage: React.FC = () => {
         color,
         icon,
     }) => (
-        <div className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${color}`}>
+        <div className={`bg-white rounded-lg shadow-md p-4 sm:p-6 border-l-4 ${color}`}>
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-gray-500 text-sm font-medium">{title}</p>
-                    <p className="text-3xl font-bold mt-2">{value}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm font-medium">{title}</p>
+                    <p className="text-2xl sm:text-3xl font-bold mt-2">{value}</p>
                     {subtitle && <p className="text-gray-400 text-xs mt-1">{subtitle}</p>}
                 </div>
-                <div className="text-4xl">{icon}</div>
+                <div className="text-3xl sm:text-4xl">{icon}</div>
             </div>
         </div>
     );
@@ -90,13 +90,13 @@ const LandingPage: React.FC = () => {
         <button
             onClick={onClick}
             // className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left w-full border-t-4 ${color} hover:scale-103 transform transition-transform`} // scale-105
-            className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg hover:scale-103 transform transition-all duration-300 ease-out text-left w-full border-t-4 ${color}`}
+            className={`bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg hover:scale-103 transform transition-all duration-300 ease-out text-left w-full border-t-4 ${color}`}
         >
-            <div className="flex items-start space-x-4">
-                <div className="text-4xl">{icon}</div>
+            <div className="flex items-start space-x-3 sm:space-x-4">
+                <div className="text-3xl sm:text-4xl">{icon}</div>
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{description}</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-800">{title}</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1">{description}</p>
                 </div>
             </div>
         </button>
@@ -111,19 +111,19 @@ const LandingPage: React.FC = () => {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-8 text-white">
-                <h1 className="text-4xl font-bold mb-2">🌱 Plant Tracker</h1>
-                <p className="text-lg opacity-90">
+            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 sm:p-8 text-white">
+                <h1 className="text-3xl sm:text-4xl font-bold mb-2">🌱 Plant Tracker</h1>
+                <p className="text-base sm:text-lg opacity-90">
                     Manage your plant collection with ease. Track plants, pots, soils, and movements all in one place.
                 </p>
             </div>
 
             {/* Statistics Grid */}
             <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Overview</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Overview</h2>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     <StatCard
                         title="Total Plants"
                         value={stats.totalPlants}
@@ -157,8 +157,8 @@ const LandingPage: React.FC = () => {
 
             {/* Quick Actions */}
             <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                     <ActionCard
                         title="View All Plants"
                         description="Browse your complete plant collection"
