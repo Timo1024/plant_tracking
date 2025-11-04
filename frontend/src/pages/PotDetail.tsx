@@ -113,14 +113,6 @@ const PotDetail: React.FC = () => {
 
     return (
         <div className="max-w-2xl mx-auto px-4 sm:px-0">
-            {/* QR Scan Success Banner */}
-            <div className="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-3 rounded flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="font-semibold">Pot Found!</span>
-            </div>
-
             <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8">
                 <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-6">
                     🪴 Pot Details
