@@ -3,15 +3,16 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
       MYSQL_DATABASE: planttracker
       MYSQL_USER: tracker
-      MYSQL_PASSWORD: trackerpass
+      MYSQL_PASSWORD: ${DB_PASSWORD:-trackerpass}
     volumes:
-      - ./data/mysql:/var/lib/mysql
-    ports:
-      - "3307:3306"
+      - mysql_data:/var/lib/mysql
+    networks:
+      - plant_tracker_net
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
@@ -19,21 +20,35 @@ services:
 
   backend:
     build: ./backend
+    restart: unless-stopped
     environment:
-      DATABASE_URL: mysql+pymysql://tracker:trackerpass@db:3306/planttracker
-      FLASK_ENV: development
+      DATABASE_URL: mysql+pymysql://tracker:${DB_PASSWORD:-trackerpass}@db:3306/planttracker
+      FLASK_ENV: ${FLASK_ENV:-production}
+      APP_DOMAIN: ${APP_DOMAIN:-http://localhost:3000}
     volumes:
-      - ./backend:/app
-      - ./backend/static/qrcodes:/app/static/qrcodes
+      - qrcodes:/app/static/qrcodes
     ports:
       - "5000:5000"
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - plant_tracker_net
 
   frontend:
     build: ./frontend
+    restart: unless-stopped
     ports:
       - "3000:80"
     depends_on:
       - backend
+    networks:
+      - plant_tracker_net
+
+networks:
+  plant_tracker_net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  qrcodes:
